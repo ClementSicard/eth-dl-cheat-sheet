@@ -3439,32 +3439,6 @@ y_k}\cdot
 \nabla_{\vy}z
 \]
 
-\intertitle{Important Notation}
-
-Note that we have a lot of indicies. Always use the following convention:
-\begin{itemize}
-  \item index of a layer: put as a \emph{superscript}
-  \item index of a dimension of a vector: put as a \emph{subscript}
-  \item futher we use the following shorthand for layer activations
-  \[
-  \vx^l:=(F^l\circ\cdots\circ F^1)(\vx)\in\R^{m_l}
-  \]
-  \[
-  x_i^l\in\R\colon\text{activation of }i\text{-th unit in layer }l
-  \]
-  \item the index of a data point (i.e., the index of one of the $N$ samples),
-  is omitted where possible, but if we really need to we'll use rectangular
-  brackets (to not confuse it with the vector indices). So,
-  \[
-  (\vx[i],\vy[i]) \text{ is the }i\text{-th sample point.}
-  \]
-\end{itemize}
-
-Note that in the following we'll be taking gradients w.r.t. one datapoint (just
-in order to not get another index in this mess). So, one data sample
-$(\vx,\vy)$. If we wanted to take the gradient w.r.t. some larger batch, then
-the resulting gradient would just be the average of the gradients for each
-sample datapoint in the batch. 
 
 \intertitle{Deep Function Compositions}
 
@@ -3683,25 +3657,7 @@ times the strength of the network's output at some node.
 %backpropagation algorithm from the DL book.}
 
 
-\subsection{Backpropagation Graphs}
 
-The approach a backpropagation graph for a loss $L$ from a FF network graph is
-as follows:
-\begin{enumerate}
-  \item (RED) Starting at the loss $L$ backward: for each node $n$ and for each
-  of its outputs $o$ which has a path to the loss, add the node $\frac{\partial
-  o}{\partial n}$ (at the height of node $n$). Connect the output $o$ and that
-  node $n$ to that newly created node.
-  \item (BROWN) Starting at the loss backward: for each node $n$ create a node
-  $\frac{\partial L}{\partial n}$ (if it doesn't exist already) and connect each
-  previously created partial node ($\frac{\partial o}{\partial n}$) to it, and
-  the previously crated (in this step) $\frac{\partial L}{\partial o}$'s too.
-\end{enumerate}
-
-\begin{center}
-  \includegraphics[width=0.7\linewidth]{%
-img/backprop-graphs}
-\end{center}
 
 \section{Convolutional Neural Networks}
 
@@ -3838,19 +3794,7 @@ $s_\Delta$.
 \[
 \forall f\colon (T(s_{\Delta} f)) = (s_{\Delta}(T f)).
 \]
-So, the commutative diagram for this is:
-\[
-\begin{tikzcd}
-f \arrow{r}{s_{\Delta}} 
-\arrow[swap]{d}{T} 
-& s_{\Delta} f = f_{\Delta}
-\arrow{d}{T}
-\\
-T f
-\arrow{r}{s_{\Delta}} 
-& s_{\Delta}(T f) = T( f_{\Delta})
-\end{tikzcd}
-\]
+
 
 \sep
 
@@ -4253,19 +4197,6 @@ connected layers
 
 \subsection{Famous CNN Architectures}
 
-\subsubsection{LeNet, 1989}
-
-MNIST, 2 Convolutional Layers + 2 Fully-connected layers
-
-\subsubsection{LeNet5}
-
-MNIST, 3 Convolutional Layers (with max-pool subsampling) + 1 Fully connected
-layer
-
-\subsubsection{AlexNet}
-
-ImageNet: similar to LeNet5, just deeper and using GPU (performance
-breaktrhough)
 
 \subsubsection{Inception Module}
 
@@ -4754,26 +4685,6 @@ them.
 
 \subsection{Optimization Challenges in NNs: Local Minima}
 
-At the beginning people were happy when they were doing convex optimization
-because there was a single optimum and it was reachable. And then when people
-started using non-convex optimization they were afraid of getting into
-non-optimal local minima and getting stuck there.
-
-\ssep
-
-Neural network cost functions can have many local minima and/or saddle points -
-and this is typical. Gradient descent can get stuck.
-
-Questions that have been looked at are
-\begin{itemize}
-  \item Ar local minima a practical issue? Somtimes not: Gori \& Tesi, 1992
-  \item Do local minima even exist? Sometimes not (auto encoder): Baldi \&
-  Hornik, 1989
-  \item Are local minima typically worse? often not (large networks): e.g.,
-  Choromanska et al, 2015
-  \item Can we understand the learning dynamics? Deep linear case has
-  similarities with non-linear case, e.g., Saxe et al., 2013
-\end{itemize}
 
 So it turns out that the non-convexity is actually not so much of an issue. It
 turns out that when we go to very high dimensions, the number of local minima VS
@@ -4782,6 +4693,170 @@ so we're much more likely to end up in a saddle point. However, in practice, if
 we do SGD there is some stochasticity that will make our gradient move. Then,
 after waiting for a while we'll exit the saddle point.
 
+
+\subsection{Least Squares: Single Layer Lin. Netw.}
+
+Let's assume that we have some inputs $\vx\in\R^n=\cX$ and some outputs
+$\vy\in\R^m=\cY$, and we have a very simple architecture, that will take our
+input $\vx$ and transform it to some output in $\cY$ the output space
+\[
+F(\vx)=\MA\vx, \qquad \MA\in\R^{m\times n}
+\]
+So then, we can define our risk as
+\[
+\cR(\MA)=\Exp{\norm{\vy-\MA\vx}_2^2}.
+\]
+so we're taking the expectation with regard to the empirical distribution
+(averaginv over all $(\vx,\vy)$-training pairs).
+
+\ssep
+
+Now, to make things simpler, we assume that the inputs are whitened, that means
+that
+\[
+\Exp{\vx\vx^\T}=\MI
+\]
+So if the mean $\mu=\vo$, then our input is uncorrelated, and every feature is
+of variance 1.
+\todo{I don't get this??}
+
+\sep
+
+Further, have a look at the following trace identities
+\[
+\vv^\T\vw=
+\sum_{i}v_iw_i
+=
+\Tr{\vv\vw^\T}
+=
+\Tr{\vw\vv^\T}
+\]
+\[
+\Tr{\MA+\MB}=\Tr{\MA} + \Tr{\MB}
+\]
+\[
+\Exp{\Tr{\rvX}}=\Tr{\Exp{\rvX}} \qquad\text{(linearity of trace and exp.)}
+\]
+
+\sep
+
+Now let's see if we can rewrite the risk differently
+\begin{gather*}
+\begin{align*}
+\cR(\underbrace{\MA}_{=\theta})
+&=
+\Exp{\norm{\vy-\MA\vx}_2^2}
+\\
+&=
+\Exp{\Tr{(\vy-\MA)(\vy-\MA)^\T}}
+\\
+\shortintertext{Using the linearity of the expectation and the trace, and some
+trace identities leads us to}
+&=
+\Tr{\Exp{\vy\vy^\T}}
+-2\sTr{\MA\underbrace{\Exp{\vx\vy^\T}}_{\mathclap{=:\MGamma^\T,\,\MGamma\in\R^{m\times
+n}}}} +\sTr{\MA\underbrace{\Exp{\vx\vx^\T}}_{\mathclap{=\MI\text{ (by
+ass.)}}}\MA^\T}
+\\
+&=
+\underbrace{\Tr{\Exp{\vy\vy^\T}}}_{\mathclap{\text{indep. of }\MA}}
+-2\Tr{\MA\MGamma^\T}
++\Tr{\MA\MA^\T}
+\end{align*}
+\end{gather*}
+Now, let's see how we can minimize the risk
+\begin{align*}
+\MA^*
+&=
+\argmin_{\MA}
+\cR(\MA)
+\\
+&=
+\argmin_{\MA}
+-2\Tr{\MA\MGamma^\T}
++\Tr{\MA\MA^\T}
+\end{align*}
+Now it's hard to continue from here, so we'll just do it via computing the
+gradient (generalized) and setting it equal to zero:
+\begin{align*}
+\cR(\MA)
+&=
+\Tr{\Exp{\vy\vy^\T}}
+-2\Tr{\MA\MGamma^\T}
++\Tr{\MA\MA^\T}
+\\
+\nabla_{\MA}\cR(\MA)
+&=
+-2\MGamma + 2\MA
+=2(\MA-\MGamma)
+\end{align*}
+So, obviously, the derivative is zero for 
+\[
+\MA^*=\MGamma
+=\Exp{\vx\vy^\T}^\T
+=\Exp{\vy\vx^\T}
+\stackrel{\text{emp. dist}}{=}
+\frac{1}{N}\sum_{i=1}^N\vy[i]\vx[i]^\T.
+\]
+
+\ssep
+
+Note that when computing the derivative we've used the following trace
+differentiation rules (cf. wikipedia, The Matrix Cookbook)
+\[
+\nabla_{\MA}\Tr{\MA\MA^\T}=2\MA
+\qquad
+\nabla_{\MA}\Tr{\MA\MB}=\MB^\T
+\]
+
+\sep
+
+
+\subsection{Stochastic Gradient Descent}
+
+So, how do we modify the gradient descent approach to work with batches?
+
+The idea in \emph{stochastic} gradient descent is to choose the update directin
+$\rvV$ \emph{at random}, such that
+\[
+\Exp{\rvV}=-\nabla_\theta\cR.
+\]
+So, the randomization scheme is unbiased.
+
+So SGD works via subsampling. So we pick a random subset
+\[
+\cS_K\subseteq\cS_N,\qquad K\leq N.
+\quad
+(\text{usually }K\ll N)
+\]
+And since we're picking $\cS_K$ at random, note how
+\[
+\Exp{\cR(\cS_K)}=\cR(\cS_N)
+\]
+And thus it also holds for the gradient that
+\[
+\nabla_{\theta}\Exp{\cR(\cS_K)}
+\stackrel{\text{lin.}}{=}
+\Exp{\nabla_{\theta}\cR(\cS_K)}
+=\nabla_{\theta}\cR(\cS_N).
+\]
+So, with SGD, we just do gradient descent, where at each $t$ we'll do a
+randomization of $\cS_K$, so
+\[
+\theta(t+1)=
+\theta(t)
+-
+\eta\nabla_\theta\cR(\theta(t);\cS_{K}(t))
+\]
+
+\sep
+
+In practice, what is done is we \emph{permute} the instances, and break them up
+into mini-batches. So we're actually not doing random sampling at every
+timestep. We're rather doing a random partitioning of the training instances
+into batches. This gives rise to the following definitions:
+
+\ssep
 
 \Def[Epoch = one sweep through the whole data]
 \begin{itemize}
@@ -5879,10 +5954,10 @@ $
 
 \subsubsection{Bi-Directional RNNs}
 
-\begin{center}
-  \includegraphics[width=0.2\linewidth]{%
-img/bi-directional-rnn}
-\end{center}
+\vspace{15 mm}
+
+
+
 
 So, additionally, we're define a \emph{reverse order sequence}
 \[
@@ -7001,6 +7076,59 @@ M_{\rvX}(\vt)
 =
 \exp\left(\vt^\T\vmu+\frac{1}{2}\vt^\T\MSigma\vt\right)
 \]
+
+\subsubsection{Dimensionality Reduction}
+
+One of the recurring things that we see in all of these models is
+\emph{dimensionality reduction}. So we have that
+\[
+\MX=f(\MZ\MB)
+\]
+where
+\begin{itemize}
+  \item $\MX$ is $N\times D$,
+  \item $\MZ$ is $N\times K$,
+  \item $\MB$ is $K\times D$, and
+  \item $K\ll D$.
+\end{itemize}
+So we have the data $\MX$ that we're trying to understand. We'll try to
+understand this data by a tall matrix $\MZ$ and a fat matrix $\MB$. The tall
+matrix are the latent factors that we've talking about (how do we summarize the
+information of each sample). And the matrix $\MB$ is telling us how we can
+recover the original data from the summary. Most of the unsupervised algorithms
+can be captured in this general framework.
+
+Depending on $f(\argdot)$ and $\MZ$ and $\MB$, we arrive at different models:
+\begin{itemize}
+  \item Principal Component Analysis / Factor Analysis \\($f$ linear)
+  \item Nonnegative Matrix Factorization\\ ($f$ ``psomolu\todo{what?}'' or
+  Bernoulli model, and bot $\MZ$ and $\MB$ have to be a nonnegative matrix).
+  \item LLE/Isomap/GPLVM (here we also try to do PCA or Factor analysis with
+  nonlinear components (with p.w. linear components))
+  \item Restricted Boltzmann Machine \\(the idea is that $\MZ$ is discrete)
+  \item Dirichlet Process (aka Chinese Restaurant Process)\\
+  \item Beta Process (aka Indian Buffet Process)
+  \item Implicit Models (e.g., Generative Adversarial Networks)\\
+  (here all the information is moved to the function $f$ instead of computing
+  the matrices $\MB$ and $\MC$)
+\end{itemize}
+
+\todo{Most of these methods just say nothing to me.}
+
+\subsubsection{Implicit Models}
+
+Here we develop statistical models via: \emph{generating stochastic mechanism}
+or \emph{simulation process}.
+
+\emph{Deep implicit models}
+\begin{itemize}
+  \item latent code $\vz\in\R^d$, $\vz\sim\pi(\vz)$, e.g.
+  $\pi(\vz)=\cN(\vo,\MI)$
+  \item parametrized mechanism: $F_\theta\colon\R^d\to\R^m$
+  \item induced distribution $\vx\in\R^m$, $\vx\sim p_\theta(\vx)$
+  \item sampling is easy: random vector + forward propagation.
+\end{itemize}
+
 
 \section{Generative Models}
 
