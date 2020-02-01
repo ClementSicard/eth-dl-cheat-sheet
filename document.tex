@@ -2121,10 +2121,6 @@ KL(p,q)\geq 0,
 \quad\text{where }H\text{ uses }p.
 $
 
-\begin{center}
-  \includegraphics[width=0.5\linewidth]{%
-img/cross-entropy}
-\end{center}
 
 \Com The second formulation clearly shows why $q:=p$ is the minimizer of the
 cross-entropy (or hence: the maximizer of the likelihood).
@@ -3173,6 +3169,18 @@ $
 \argmin_{F\in\cF}
 \cR(F;S_N)
 $
+\sep
+
+
+\Def[Log Likelihood]
+
+Canonical way of defining generalized loss function: negative of log-likelihood function
+
+$
+\ell(\vy,\theta;\vx)=-\log(\cProb{\vy}{\vx;\theta})
+$
+\sep
+
 
 \subsubsection{Why Regularization is Needed}
 
@@ -3431,32 +3439,6 @@ y_k}\cdot
 \nabla_{\vy}z
 \]
 
-\intertitle{Important Notation}
-
-Note that we have a lot of indicies. Always use the following convention:
-\begin{itemize}
-  \item index of a layer: put as a \emph{superscript}
-  \item index of a dimension of a vector: put as a \emph{subscript}
-  \item futher we use the following shorthand for layer activations
-  \[
-  \vx^l:=(F^l\circ\cdots\circ F^1)(\vx)\in\R^{m_l}
-  \]
-  \[
-  x_i^l\in\R\colon\text{activation of }i\text{-th unit in layer }l
-  \]
-  \item the index of a data point (i.e., the index of one of the $N$ samples),
-  is omitted where possible, but if we really need to we'll use rectangular
-  brackets (to not confuse it with the vector indices). So,
-  \[
-  (\vx[i],\vy[i]) \text{ is the }i\text{-th sample point.}
-  \]
-\end{itemize}
-
-Note that in the following we'll be taking gradients w.r.t. one datapoint (just
-in order to not get another index in this mess). So, one data sample
-$(\vx,\vy)$. If we wanted to take the gradient w.r.t. some larger batch, then
-the resulting gradient would just be the average of the gradients for each
-sample datapoint in the batch. 
 
 \intertitle{Deep Function Compositions}
 
@@ -3675,25 +3657,7 @@ times the strength of the network's output at some node.
 %backpropagation algorithm from the DL book.}
 
 
-\subsection{Backpropagation Graphs}
 
-The approach a backpropagation graph for a loss $L$ from a FF network graph is
-as follows:
-\begin{enumerate}
-  \item (RED) Starting at the loss $L$ backward: for each node $n$ and for each
-  of its outputs $o$ which has a path to the loss, add the node $\frac{\partial
-  o}{\partial n}$ (at the height of node $n$). Connect the output $o$ and that
-  node $n$ to that newly created node.
-  \item (BROWN) Starting at the loss backward: for each node $n$ create a node
-  $\frac{\partial L}{\partial n}$ (if it doesn't exist already) and connect each
-  previously created partial node ($\frac{\partial o}{\partial n}$) to it, and
-  the previously crated (in this step) $\frac{\partial L}{\partial o}$'s too.
-\end{enumerate}
-
-\begin{center}
-  \includegraphics[width=0.7\linewidth]{%
-img/backprop-graphs}
-\end{center}
 
 \section{Convolutional Neural Networks}
 
@@ -3830,19 +3794,7 @@ $s_\Delta$.
 \[
 \forall f\colon (T(s_{\Delta} f)) = (s_{\Delta}(T f)).
 \]
-So, the commutative diagram for this is:
-\[
-\begin{tikzcd}
-f \arrow{r}{s_{\Delta}} 
-\arrow[swap]{d}{T} 
-& s_{\Delta} f = f_{\Delta}
-\arrow{d}{T}
-\\
-T f
-\arrow{r}{s_{\Delta}} 
-& s_{\Delta}(T f) = T( f_{\Delta})
-\end{tikzcd}
-\]
+
 
 \sep
 
@@ -4245,19 +4197,6 @@ connected layers
 
 \subsection{Famous CNN Architectures}
 
-\subsubsection{LeNet, 1989}
-
-MNIST, 2 Convolutional Layers + 2 Fully-connected layers
-
-\subsubsection{LeNet5}
-
-MNIST, 3 Convolutional Layers (with max-pool subsampling) + 1 Fully connected
-layer
-
-\subsubsection{AlexNet}
-
-ImageNet: similar to LeNet5, just deeper and using GPU (performance
-breaktrhough)
 
 \subsubsection{Inception Module}
 
@@ -4284,11 +4223,6 @@ convolution), aka ``network within a network''.
 
 
 \subsubsection{Google Inception Network}
-
-\begin{center}
-  \includegraphics[width=0.5\linewidth]{%
-img/inception-module-mixing}
-\end{center}
 
 The Google Inception Network uses many layers of this inception module along
 with some other tricks
@@ -4751,26 +4685,6 @@ them.
 
 \subsection{Optimization Challenges in NNs: Local Minima}
 
-At the beginning people were happy when they were doing convex optimization
-because there was a single optimum and it was reachable. And then when people
-started using non-convex optimization they were afraid of getting into
-non-optimal local minima and getting stuck there.
-
-\ssep
-
-Neural network cost functions can have many local minima and/or saddle points -
-and this is typical. Gradient descent can get stuck.
-
-Questions that have been looked at are
-\begin{itemize}
-  \item Ar local minima a practical issue? Somtimes not: Gori \& Tesi, 1992
-  \item Do local minima even exist? Sometimes not (auto encoder): Baldi \&
-  Hornik, 1989
-  \item Are local minima typically worse? often not (large networks): e.g.,
-  Choromanska et al, 2015
-  \item Can we understand the learning dynamics? Deep linear case has
-  similarities with non-linear case, e.g., Saxe et al., 2013
-\end{itemize}
 
 So it turns out that the non-convexity is actually not so much of an issue. It
 turns out that when we go to very high dimensions, the number of local minima VS
@@ -4779,7 +4693,6 @@ so we're much more likely to end up in a saddle point. However, in practice, if
 we do SGD there is some stochasticity that will make our gradient move. Then,
 after waiting for a while we'll exit the saddle point.
 
-Now, next we'll look at the insights that were gained by the paper of Saxe.
 
 \subsection{Least Squares: Single Layer Lin. Netw.}
 
@@ -4898,138 +4811,6 @@ differentiation rules (cf. wikipedia, The Matrix Cookbook)
 
 \sep
 
-\todo{Verify if this approach is correct!!}
-
-Note that one could have solved the solution also through the following way, by
-recognizing that $\MA(t)$ follows the following differential equation
-\[
-\dot{\MA}(t)=-\eta\nabla_{\MA}\cR(\MA(t))
-=2\eta(\MGamma-\MA(t))
-=2\eta\MGamma - 2\eta\MA(t).
-\]
-So rearranging the equation for $\MA(t)$ we get
-\[
-\MA(t)=-\frac{1}{2}\eta\dot{\MA}(t)+\MGamma
-\]
-And now, since we're using gradient descent, we'll converge, and the gradients
-will go to zero, hence
-\[
-\lim_{t\to\infty}\MA(t)
-=
--\frac{1}{2}
-\eta
-\underbrace{\left(\lim_{t\to\infty}\dot{\MA}(t)\right)}_{\to 0}
-+\MGamma
-=\MGamma.
-\]
-So $\MA(t)$ will converge to $\MGamma$.
-
-\subsection{Least Squares: Two-Layer Lin. Netw.}
-
-Now, the question is what happens, when we build a two-layer linear network
-(again with the squared error), with no nonlinearity. So we'll have a linear
-mapping (that is composed of two linear mappings)
-\[
-F(\vx)=\MA\vx=\MQ\MW\vx
-\]
-Now, from what we've seen before, we can express the risk as (due to trace
-identities, trace linearity, etc.) just by replacing $\MA=\MQ\MW$, so
-\[
-\cR(\MQ,\MW) = \text{const.}+\Tr{(\MQ\MW)(\MQ\MW)^\T}
--2\Tr{\MQ\MW\MGamma^\T}
-\]
-Now, taking the derivatives w.r.t. the parameters, we get (using the chain rule)
-\begin{align*}
-\nabla_{\MQ}\cR(\MQ,\MW)
-=
-\frac{\partial \cR(\MA)}{\partial \MA}
-\frac{\partial \MA}{\partial\MQ}
-\\
-\nabla_{\MW}\cR(\MQ,\MW)
-=
-\frac{\partial \cR(\MA)}{\partial \MA}
-\frac{\partial \MA}{\partial\MW}
-\end{align*}
-\todo{This is wrong, because $\MQ^\T$ is on the left!! How is the chain rule
-done here?}
-
-Which in the end gives us
-\begin{align*}
-\nabla_{\MQ}\cR(\MQ,\MW)
-&=
-2\underbrace{\MQ\MW}_{=\MA}\MW^\T-2\MGamma\MW^\T
-=2(\MA-\MGamma)\MW^\T
-\\
-\nabla_{\MW}\cR(\MQ,\MW)
-&=2\MQ^\T\underbrace{\MQ\MW}_{=\MA}-2\MQ^\T\MGamma
-=2\MQ^\T(\MA-\MGamma)
-\end{align*}
-Now, what we'll do is we'll perform the SVD of $\MGamma$ (we can do this since
-$\MGamma$ only depends on the data, it was the correlation matrix between the
-inputs and the outputs).
-So,
-\[
-\MGamma=\MU\MSigma\MV^\T.
-\]
-Now, we'll linearly transform the variables:
-\begin{align*}
-\widetilde{\MQ}&=\MU^\T\MQ
-\quad\Longleftrightarrow\quad
-\MQ=\MU\widetilde{\MQ}
-\\
-\widetilde{\MW}&=\MW\MV
-\quad\Longleftrightarrow\quad
-\MW=\widetilde{\MW}\MV^\T
-\end{align*}
-\todo{Are we assuming something on the rank of $\MGamma$? Or should we express
-it via transposes?}
-
-Then, we have that the common term in the gradients $\MA-\MGamma$ can be written
-as follows
-\begin{align*}
-\MA-\MGamma
-&=\MQ\MW-\MU\MSigma\MV^\T
-\\
-&=\MU\underbrace{\MU^\T\MQ}_{=\widetilde{\MQ}}
-\underbrace{\MW\MV}_{=\widetilde{\MW}}\MV^\T-\MU\MSigma\MV^\T
-\\
-&=\MU(\widetilde{\MQ}\widetilde{\MW}-\MSigma)\MV^\T
-\end{align*}
-And we can re-express the risk in terms of $\widetilde{\MQ},\widetilde{\MW}$ as
-follows:
-\begin{align*}
-\cR(\widetilde{\MQ},\widetilde{\MW})
-&=
-\text{const.}
-+
-\Tr{(\MU^\T\widetilde{\MQ}\widetilde{\MW}\MV^\T)
-(\MU^\T\widetilde{\MQ}\widetilde{\MW}\MV^\T)^\T}
-\\
-&\qquad-2\Tr{(\MU^\T\widetilde{\MQ}\widetilde{\MW}\MV^\T)\MGamma^\T}
-\end{align*}
-And we can compute the corresponding projected gradients in terms of
-$\widetilde{\MQ},\widetilde{\MW}$ as follows.
-
-\todo{write the gradients here}
-\begin{align*}
-\nabla_{\widetilde{\MQ}}\cR(\widetilde{\MQ},\widetilde{\MW})
-&=\MU^\T\nabla_{\MQ}\cR(\MQ,\MW)=\cdots
-\\
-\cdots &=\cdots
-\end{align*}
-
-So, as we can easily see, the gradients can be computed through the rules of
-linearity.
-
-\todo{Do the rest of this\ldots}
-
-\todo{Do the rest of this\ldots}
-
-\todo{Do the rest of this\ldots}
-
-\todo{Do the rest of this\ldots}
-
-\todo{Do the rest of this\ldots}
 
 \subsection{Stochastic Gradient Descent}
 
@@ -5313,91 +5094,6 @@ diminish and lead to the solution. What batch normalization tries to achieve is
 to remove the dependencies between the layers. So the learning algorithm can
 optimize the weights of each layer independently. Of course, that's not really
 what happens, but anyways that's the idea behind it.
-
-
-Let's have  alook at a toy example to illustrate this is: a deep linear network
-with one unit per layer:
-\[
-y=w_1w_2\cdot\cdots\cdot w_L x=\left(\prod_{l=1}^L w_l\right)x
-\]
-For later notation, let us collect all the weights in a set
-\[
-W:=\set{w_1,\ldots,w_L}
-\]
-After the gradient step we'll have the following situation:
-\begin{gather*}
-\begin{align*}
-y^{\text{new}}
-&=
-\left(
-\prod_{l=1}^L 
-\left(
-w_l-\eta\frac{\partial \cR}{\partial w_l}
-\right)
-\right)x
-\\
-\intertext{So what actually happens is that if we take the term 
-for $y^{new}$ and we expand it this leads to terms of up to order $L$.
-} 
-&=
-\left(
-w_1-\eta\frac{\partial \cR}{\partial w_1}
-\right)
-\left(
-w_2-\eta\frac{\partial \cR}{\partial w_2}
-\right)
-\cdots
-\left(
-w_L-\eta\frac{\partial \cR}{\partial w_L}
-\right)
-x
-\\
-&=
-\left(
-\left(\prod_{l=1}^L w_l\right)
--\eta\frac{\partial \cR}{\partial w_1}
-\left(\prod_{l=2}^L w_l\right)
-+\cdots+
-(-\eta)^L
-\left(\prod_{l=1}^L \frac{\partial \cR}{\partial w_l}\right)
-\right)
-x
-\\
-&=
-\underbrace{\left(\prod_{l=1}^L w_l\right)x}_{=y}
--\eta\frac{\partial \cR}{\partial w_1}
-\left(\prod_{l=2}^L w_l\right)x
-+\cdots+
-(-\eta)^L
-\left(\prod_{l=1}^L \frac{\partial \cR}{\partial w_l}\right)x
-\\
-&=
-y
-\underbrace{-\eta\frac{\partial \cR}{\partial w_1}
-\left(\prod_{l=2}^L w_l\right)x
-+\cdots+
-(-\eta)^L
-\left(\prod_{l=1}^L \frac{\partial \cR}{\partial w_l}\right)x
-}_{(*) \text{ significant?}}
-\\
-&=
-y+
-\underbrace{\sum_{S\in\cP(W)}
-\left[
-(-\eta)^{\card{W\setminus S}}
-\left(\prod_{w\in S}w\right)
-\left(\prod_{w\in W\setminus S}
-\frac{\partial \cR}{\partial w}\right)x
-\right]}_{(*)\text{ significant?}}
-\end{align*}
-\end{gather*}
-Hence, the higher order terms in terms of $\eta$ $(*)$ may become significant,
-despite the damping.
-
-\ssep
-
-\todo{Talk more exactly about the significance (which terms are good and which
-are bad).}
 
 \ssep
 
@@ -6020,321 +5716,6 @@ question that we want to solve. Typical questions are:
   location, time, actor, \ldots, or, noun, verb, adjective, \ldots) 
 \end{itemize}
 
-\subsubsection{Bi-Linear Models}
-
-The first thing that we could do is to use an information theoretic quantity:
-the so-called \emph{mutual information}. The mutual information is described in
-information theory as \emph{how much information one random variable has about
-another random variable}. If two variables are independent, then, the mutual
-information will be zero. 
-
-So, if we put two words nearby, it's because they have to be related somehow in
-the \emph{meaning} of the sentence. Hence, we expect them to have a larger
-mutual information.
-
-\sep
-
-\Def[Pointwise Mutual Information]
-\begin{gather*}
-\begin{align*}
-\pmi(v,w)
-=
-\log\left(
-\frac{\Prob{v,w}}{\Prob{v}\Prob{w}}
-\right)
-=\log\left(
-\frac{\cProb{v}{w}}{\Prob{v}}
-\right)
-\approx
-\vx_v^\T\vx_w
-+\text{const}
-\end{align*}
-\end{gather*}
-
-\Com As you can see this metric is bi-linear.
-
-\sep
-
-So we interpret the vectors as \emph{latent variables} and link them to
-the observable probabilistic model. So the pointwise mutual information is
-related to the inner product between the latent vectors (the more related, the
-more co-linear the latent representations have to be).
-
-Now, how do we compute the pointwise mutual information? One thing that we could
-do is to just look for words that are nearby and compute these probabilities
-empirically. This leads us to the idea of skip-grams.
-
-\sep
-
-\Def[Skip Grams] The skip-gram approach is an approach to look at co-occurrences
-of words within a window size $R$ (instead of looking at subsequences of some
-length $n$ as with $n$ grams). So we're only interested in the co-occurrence
-within some window size of words $R$, rather than a precise sequence.
-
-\sep
-
-\Def[Co-Occurrence Set] Here we look at the \emph{pairwise occurrences} of words
-in a \emph{context window} of size $R$. So, if we have a long sequence of words
-$\vw=(w_1,\ldots,w_T)$, then the co-occurrence index set is defined as
-\[
-\cC_R:=\dset{(i,j)}{1\leq\abs{i-j}\leq R}.
-\]
-
-\sep
-
-\Def[Co-Ocurrence Matrix] Note that in order to get an (empirical) idea of the
-co-ocurrence frequencies one could compute the co-ocurrence matrix
-\[
-\MC\in\R^{\card{\cV}\times\card{\cV}},
-\quad\text{where }
-C_{ij}=\begin{matrix}
-\#\text{of co-occurrences of }w_i\text{ and }w_j \\
-\text{within window size }R.
-\end{matrix}
-\]
-Properties: $\MC=\MC^\T$ (symmetric), peaky, sparse.
-
-\sep
-
-One approach for embeddings: do PCA of $\MC$ and use $k$ eigenvectors
-corresponding to largest eigenvalues of $\MC$. Note that we have
-\begin{gather*}
-\begin{align*}
-C_{ij}
-&=
-\underbrace{\text{one-hot}(w_i)}_{\vo_i}\MC
-\underbrace{\text{one-hot}(w_j)}_{\vo_j}
-=
-\vo_i\underbrace{\MV\MLambda\MV^\T}_{\text{SVD of }\MC}\vo_j
-\\
-&\approx
-\vo_i\underbrace{\MV_k\MLambda_k\MV_k^\T}_{k\text{ PCs}}\vo_j
-=
-\underbrace{\vo_i\MV_k\MLambda_k^{\frac{1}{2}}}_{\text{emb. }\vx_{w_i}}
-\underbrace{\MLambda_k^{\frac{1}{2}}\MV_k^\T\vo_j}_{\text{emb. }\vx_{w_j}}
-\end{align*}
-\end{gather*}
-
-de-embedding: $\MV\MLambda_k^{-\frac{1}{2}}$ (then find nearest neighbour)
-
-Problem: $\MC$ is huge ($\card{\cV}^2$), hence matrix-factorization becomes
-prohibitively expensive!
-
-Solution: Use skip-gram approach to avoid computing $\MC$ at all!
-
-\ssep
-
-The solution to this is pretty simple: we train a model that tries to predict
-for one word $w_t$ the preceding and following words:
-\[
-w_{t-c},w_{t-c+1},\ldots,w_{t-1},w_t,w_{t+1},\ldots,w_{t+c-1},w_{t+c}.
-\]
-Here's an illustration of the model for $t=3$:
-
-$\text{input }w(t)\to\text{projection}\to w(t-2), w(t-1), w(t+1), w(t+2) \text{
-output}$
-
-Note that the assumption (or simplification) of this model is that it assumes
-that the words $W_i$, $W_j$ within the window $+c$, $-c$ of $W_t$ are
-conditionally independent of each other given $W_t$.
-\[
-W_i\indep W_j\given W_t
-\qquad
-(i\neq j\land i\neq t\land j\neq t)
-\]
-That might be too much of an assumption but you can see that sometimes when
-we're talking about something we may change the order of the words and still
-mean the same thing (e.g., ``I was born in 1973.'', ``1973 is the year I was
-born.''). So in a way we're just trying to capture the meaning of $W_t$ with
-this. So this gives us an idea of the context of $W_t$ and might relieve the
-structure we're looking for. So, it's not as optimal as computing $\MC$, but
-it's a way to start.
-
-\ssep
-
-So actually, what we want to do is we want to maximize the likelihood of the
-co-occurrences in our dataset:
-\[
-\theta^*
-=\argmax_{\theta}
-\prod_{(i,j)\in C_R}
-\cProb[\theta]{w_i}{w_j}
-\]
-Now our approach to approximate the probability $\cProb[\theta]{w_i}{w_j}$ as
-follows: it should be something that is related to the dot product of the
-embeddings, so $\vx_{w_i}^\T\vz_{w_j}$ (note how we use two different
-embeddings as the conditional probability is asymmetric), but in order to make
-the probability positive we'll take the exponential of it and normalize.
-Further, for SGD it's always better to optimize a sum: so we'll optimize the
-log-likelihood of co-occurrent words in our dataset $\vw=(w_1,\ldots,w_T)$:
-\begin{align*}
-&=\argmax_{\theta}
-\sum_{(i,j)\in C_R}
-\log\left(
-\frac{
-\exp\left(\vx_{w_i}^\T\vz_{w_j}\right)
-}{
-\sum_{u\in\cV}
-\exp\left(\vx_{u}^\T\vz_{w_j}\right)
-}
-\right)
-\\
-&=\argmax_{\theta}
-\sum_{(i,j)\in C_R}
-\vx_{w_i}^\T\vz_{w_j}
--
-\log\left(\underbrace{\sum_{u\in\cV}\exp\left(\vx_u^\T\vz_w\right)}_{
-\text{partition function}
-}\right)
-\end{align*}
-
-So the idea is to use two different latent vectors $\vx_w$ and $\vz_w$ per word
-(to allow for the asymmetry for the conditional probability)
-\[
-\theta=(\vx_w,\vz_w)_{w\in\cV}
-\]
-where
-\begin{itemize}
-  \item $\vx_w$ is used to predict $w$'s conditional probability, and
-  \item $\vz_w$ is used to use $w$ as an evidence in the cond. prob.
-\end{itemize}
-
-Note that $\MC$ is actually symmetric (as it represents the joint probabilies),
-but the probabilities that we're computing are asymmetric (conditional
-probability).
-
-\textbf{Problem:} Note however that it's too expensive to compute the
-\emph{partition function} as we have to do a full sum over $\cV$ (can be $\sim$
-$10^5$ up to $10^7$). And we'd have to do this every time we pass a new
-batch-sample $(w_{t+\ell},w_t)$ through the network.
-
-\textbf{Brillieant idea of skip-grams:} instead of computing the partition
-function, turn the problem of determining $\cDist{P_\theta}{w_i}{w_j}$ into a
-classification problem (logistic regression). So, we create a classifier that
-determines the co-occurring likelihood of the words on a scale from 0 to 1.
-
-For this reason we'll introduce the following function
-\[
-D_{w_i,w_j}
-=
-\begin{cases}
-1,& \text{if }(i,j)\in C_R,\\
-0,& \text{if }(i,j)\nin C_R.
-\end{cases}
-\]
-and we'll squash the dot-product to something between 0 and 1 to make it serve
-as a probability
-\[
-\cProb[\theta]{w_i}{w_j}
-\cong\cProb[\theta]{D_{w_i,w_j}=1}{\vx_{w_i},\vz_{w_j}}
-=\sigma(\vx_{w_i}^\T\vz_{w_j})
-\]
-and the opposite event is given by:
-\[
-\cProb[\theta]{D_{w_i,z_j}=0}{\vx_{w_i},\vz_{w_j}}
-=1-\sigma(\vx_{w_i}^\T\vz_{w_j})
-=\sigma(-\vx_{w_i}^\T\vz_{w_j})
-\]
-Further, instead of just maximizing the likelihood over the dataset of
-co-occurrences $D$, we'll also maximize the log likelihood over a dataset of
-non-co-occurrences $\overline{D}$ (negative samples). So, we'll have the
-following maximization problem
-\begin{gather*}
-\begin{align*}
-\theta^*
-&=\argmax_{\theta}
-\sum_{(i,j)\in D}
-\log\left(\cProb[\theta]{D_{w_i,w_j}=1}{\vx_{w_i},\vz_{w_j}}\right)
-\\
-&\quad+
-\sum_{(i,j)\in \overline{D}}
-\log\left(1-\cProb[\theta]{D_{w_i,w_j}=0}{\vx_{w_i},\vz_{w_j}}\right)
-\\
-&=\argmax_{\theta}
-\sum_{(i,j)\in D}
-\log\left(\sigma(\vx_{w_i}^\T\vz_{w_j})\right)
-+
-\sum_{(i,j)\in \overline{D}}
-\log\left(\sigma(-\vx_{w_i}^\T\vz_{w_j})\right)
-\\
-&=\argmax_{\theta}
-\sum_{(i,j)\in C_R}
-\left[
-\underbrace{\log(\sigma(\vx_{w_i}^\T\vz_{w_j}))}_{\text{positive examples}}
-+
-\underbrace{k\cdot\Exp[v\sim p_n]{\log(\sigma(-\vx_{w_i}^\T\vz_{v}))}}_{\text{
-negative examples}}
-\right].
-\end{align*}
-\end{gather*}
-
-As we can see in the last step, instead of computing these sums separately,
-we'll do it as follows: we'll compute the log likelihood for one concrete
-positive example $(w_i,w_j)$ and produce some negative examples $(w_i,v)$, so
-we'll approximate the expectation below and weigh it a bit higher (oversampling
-facotr).
-
-The negative examples are just sampled from the negative sampling
-distribution $p_n(w)$: for that we determine relative frequencies of words
-$p(w)$ and dampen them with a factor $\alpha<1$ (usually: $\alpha=\frac{3}{4}$).
-Then $p_n(w)=\alpha p(w)$ to increase the chance of true negatives. Even if by
-chance we might produce false negative examples this event is rather rare. The
-factor $k$ is just tu weight the negative examples a bit more in the loss.
-Usually $k\approx 2$ to $10$ (oversampling factor).
-
-\subsection{From Embedding Words to Embedding Sequences of Words}
-
-\textbf{Question:} Can we extend word embeddings to embeddings for
-\emph{sequences of words}? So what we're after is \emph{understanding the
-sentence}.
-
-\ssep
-
-Why is this relevant? This is the fundamental question of \emph{statistical
-language modeling} (cf. Shannon). So we'd like to estimate the probability of a
-sequence of words in a certain order:
-\[
-\text{estimate }
-\Prob{w_1,\ldots,w_T}
-\stackrel{\text{prod. rule}}{=}
-\prod_{t=1}^T
-\cProb{w_t}{w_{t-1},\ldots,w_1}
-\]
-As we can see, thanks to the product rule this problem decomposes to predicting
-the next word of a sequence of words.
-
-\sep
-
-This problem has been adressed in different ways. Here are the traditional
-approach, and the more modern approaches.
-
-\begin{enumerate}
-  \item \textbf{Traditional Approach:} $k$-th order Markov assumption
-\begin{gather*}
-\begin{align*}
-\cProb{w_t}{w_{t-1},\ldots,w_1}
-\stackrel{\text{Markov ass.}}{\approx}
-\cProb{w_t}{w_{t-1},\ldots,w_{t-k}}
-\stackrel{\text{emp. dist.}}{\approx}
-(k+1)-\text{gram counts}
-\end{align*}
-\end{gather*}
-In practice we often use 5-grams, i.e., $k=4$ (last 4 words).
-  \item \textbf{Modern Approach:} Create language models via embeddings
-\[
-\log\left(\cProb{w_t}{\vw:=w_{t-1},\ldots,w_{1}}\right)
-=
-\vx_{w_t}^\T\vz_{\vw}
-+
-\text{const}
-\]
-where
-\begin{itemize}
-  \item $\vx_{w_t}$ is the word embedding
-  \item $\vz_{\vw}$ is the sequence embedding (predicts the context)
-\end{itemize}
-\end{enumerate}
-
 \ssep
 
 There are three main approaches to construct \emph{sequence embeddings}:
@@ -6352,76 +5733,7 @@ There are three main approaches to construct \emph{sequence embeddings}:
   \item Recursive networks (in combination with parsers)
 \end{enumerate}
 
-\subsubsection{ConvNets: Word Representations}
 
-\begin{center}
-  \includegraphics[width=1\linewidth]{%
-img/cnn-text-overview}
-\end{center}
-
-The main stages in th \emph{``ConvNet''} architecture aka
-\emph{``time-delay NN with max-over-time pooling''} are:
-
-\begin{enumerate}
-  \item \textbf{Embed Words:} Map word sequence (of $n$ words) to a sequence of
-  embedded vectors in $\R^d$. Store these into the \emph{sentence matrix} in
-  $\R^{d\times n}$.
-  \item \textbf{Concatenation:} Then, we'll concatenate the columns of the
-  sentence matrix, which will give us a variable-length embedded \emph{sentence
-  vector} of length in $\R^{n\cdot d}$:
-  \item \textbf{Convolution:} Then we'll do a convolution over the sentence
-  vector. Hereby, we'll convolve a number of embedded words (e.g., 3) at each
-  step. Of course the convolution parameters are shared.
-  \begin{itemize}
-    \item Filter size: $(d w)\times c$
-    \\$w=$ window size, e.g., 3-5 words, and\\ 
-    $k=$ \#channels. (hyperparameter that we'll have to tune)
-    \item Stride: $d$ (1 word)
-    \item Non-linearity: simple one like tanh or ReLU. 
-  \end{itemize}
-  So the convolution will transform the stacked vector of embeddings as follows:
-  \[
-  f\colon \R^{n\cdot d}\to\R^{(n-w+1)\times k}
-  \]
-  \item \textbf{Max-Pooling over Time:} Now what is really different from text
-  to images is that texts are of different lengths (and if the images are not we
-  can easily convert them to the same size). So the pooling is done a bit
-  different here: what is done is that we have $k$ channels and $n-w+1$
-  convolution results for the sentences. So then, for each channel we do a
-  max-pooling in time over all the convolution results.
-  \[
-  \R^{(n-w+1)\times k}\to\R^k
-  \]
-  So, suddenly, in this step we remove the temporal information. Further note,
-  how through this mapping every word sequence now maps to a fixed-length
-  representation.
-  \item \textbf{2-Layer Fully Coonnected + Softmax:} Once we have the output of
-  the max-pooling, we just put a two-layer fully-connected layer and a softmax
-  at the end. This will predict the following-word probabilities via soft-max as
-  follows:
-  \[
-  \cProb{w_{t+1}}{\vw}
-  = \frac{\exp\left(\vy_{w_t}^\T\vz_{\vw}\right)}{
-  \sum_{u\in\cV}\exp\left(\vy_{u}^\T\vz_{\vw}\right)
-  }.
-  \]
-  \todo{Understand what they mean by uses two word embeddings}
-  \todo{$\vy_v\in\R^k$ and $\vx_v\in\R^d,\vy_v\in\R^k$}
-  \todo{what is $\vz_{w}$?? Is this the vector after pooling???}
-  \todo{Reconnect everything by saying how the output gives us our original
-  goal (the predicted $w_t$)\ldots}
-\end{enumerate}
-
-One thing to note about this architecture is that most of the parameters were
-in the embedding.
-
-\subsubsection{Dynamic CNNs}
-
-Kalchbrenner et al suggested Dynamic CNNs in 2014 (as an alternative to
-ConvNet). They are exactly the same as ConvNets except for one thing: before
-doing the max-pooling over time (to get a fixed-size representation), they do a
-dynamic max-pooling (dynamic since it depends on the input size) over the
-sentence and another convolution.
 
 \subsection{Recurrent Networks (RRNs)}
 
@@ -6620,169 +5932,7 @@ evaluated at different points. Now, if the sequence is very long (large $T$)
 then we're multiplying a lot of times the same jacobian (yet evaluated at
 different points) by itself.
 
-\sep
 
-\Def[Spectral Matrix Norm (Largest Singular Value)]
-\[
-\norm{\MA}_2
-:=
-\max_{\vx,\norm{\vx}_2=1}
-\norm{\MA\vx}_2
-=:
-\sigma_{\max}(\MA).
-\]
-
-\sep
-
-\Thm $\norm{\MA\MB}_2\leq\norm{\MA}_2\cdot\norm{\MB}_2$.
-
-\sep
-
-Now, let's have a look at the product of Jacobians for RNNs (single-output
-case, otherwise it would just be a sum of longer and longer products of
-Jacobians). Let's have a look at the gradient of $\cR$ w.r.t. some input
-$\vx^t$ at iteration $t$:
-\tcr{This is a good formula for backpropagation through time!! If we did this
-w.r.t. the parameters we'd have to sum it up over $t=1$ to $T$.}
-\begin{gather*}
-\begin{align*}
-\nabla_{\vx^t}\cR
-&=
-\frac{\partial \vh^t}{\partial \vx^t}
-\frac{\partial \vh^{t+1}}{\partial \vh^t}
-\frac{\partial \vh^{t+2}}{\partial \vh^{t+1}}
-\cdots
-\frac{\partial \vh^{T-1}}{\partial \vh^{T-2}}
-\frac{\partial \vh^T}{\partial \vh^{T-1}}
-\frac{\partial \vy^T}{\partial \vh^T}
-\frac{\partial \cR}{\partial \vy^T}
-\\
-&=
-\evalat{\MJ_{F}^\vx}{\vx^t,\vh^{t-1}}
-\evalat{\MJ_{F}^\vh}{\vx^{t+1},\vh^t}
-\cdot\cdots\cdot
-\evalat{\MJ_{F}^\vh}{\vx^T,\vh^{T-1}}
-\evalat{\MJ_{H}}{\vh^{T}}
-\nabla_{\vy^T}\cR.
-\\
-&=
-\evalat{\MJ_{F}^\vx}{\vx^t,\vh^{t-1}}
-\left(
-\prod_{s=t}^{T-1}
-\evalat{\MJ_{F}^\vh}{\vx^{s+1},\vh^{s}}
-\right)
-\evalat{\MJ_{H}}{\vh^{T}}
-\nabla_{\vy^T}\cR
-\\
-&=
-\evalat{\MJ_{F}^\vx}{\vx^t,\vh^{t}}
-\left(
-\prod_{s=t}^{T-1}
-\underbrace{\diag(\sigma'(\MW\vh^{s}+\MU\vx^{s+1}+\vb))}_{
-\MS_{\vx^{s+1},\vh^{s}}
-}
-\MW
-\right)
-\evalat{\MJ_{H}}{\vh^{T}}
-\nabla_{\vy^T}\cR
-\end{align*}
-\end{gather*}
-Note that when talking about $\MJ_F^\vh$ we mean the Jacobian w.r.t. $\vh$ (and
-analogously $\vx$). We need to make this explicit, since $F$ acutally has
-two arguments. Now, the Jacobians were just computed as follows
-\[
-\evalat{(\MJ_F)_{ij}^{\vh}}{\vx^t,\vh^{t-1}}
-=
-\frac{\partial F_i}{\partial h_j^{t-1}}
-=
-\frac{\partial h^t_i}{\partial h_j^{t-1}}
-=
-\sigma'(\MW\vh^{t-1}+\MU\vx^t+\vb)_i\cdot w_{ij}
-\]
-\[
-\evalat{\MJ_F^\vh}{\vx^t,\vh^{t-1}}
-=
-\underbrace{
-\diag(\sigma'(\MW\vh^{t-1}+\MU\vx^t+\vb))}_{
-=\MS_{\vx^t,\vh^{t-1}}
-}
-\cdot
-\MW
-\]
-Now, for the eigenvalues of these Jacobians, we have that
-\[
-\MS_{\vx^t,\vh^{t-1}}\leq\MI
-\tag{\circ}
-\]
-if $\sigma\in\set{\text{logistic,tanh,ReLU}}$. Hence $\MS_{\vx^t,\vh^{t-1}}$
-will make the gradients vanish over time (when the products gets large, so $t$
-is small) if $\MW$ doesn't have big enough eigenvalues.
-
-\sep
-
-\Ex Concretely, if $\vx:=\vx^1,\vx^2,\ldots,\vx^T$ was a movie review, then the
-gradients for the first part of the review would vanish, and only the
-gradients of the last part of the review would exist.
-
-\sep
-
-So, let's have a look at what happens to the spectral norm of this product of
-Jacobians:
-\begin{gather*}
-\begin{align*}
-\norm{
-\prod_{s=t}^{T-1}
-\MS_{\vx^{s+1},\vh^{s}}
-\MW
-}_2
-\stackrel{(\circ)}{\leq}
-\norm{\prod_{s=t}^{T-1}\MW}_2
-=
-\norm{\MW^{T-t-1}}_2
-\leq
-\norm{\MW}_2^{T-t-1}
-=
-\sigma_{\max}(\MW)^{T-t-1}
-\end{align*}
-\end{gather*}
-Now, this means that
-\begin{itemize}
-  \item If $\sigma_{\max}(\MW)<1$, then the gradients will vanish
-  \[
-  \norm{\nabla_{\vx^t}\cR}_2
-  \leq
-  C\cdot
-  \sigma_{\max}(\MW)^{T-t-1}
-  \stackrel{(T-t-1)\to\infty}{\to}
-  0,
-  \]
-  where $C$ is just some constant that depends on the other matrix and
-  vector norms, but not on $T-t$.
-  \item Conversely, if $\sigma_{\max}(\MW)>1$ the gradient may, or may not
-  explode - we can't really say something.
-\end{itemize}
-This was observed and published in a paper by Pascanu, Mikolov, Bengion in 2013.
-
-\intertitle{Fixing Exploding/Vanishing Gradients}
-
-\begin{itemize}
-  \item When the gradients are exploding a common heuristic is to clip the
-  gradients (shring the gradient norm once it gets too big), so-called gradient
-  clipping.
-  \[
-  \nabla_\vx \cR
-  \gets
-  \nabla_\vx \cR \cdot
-  \frac{\gamma_{\max}}{
-  \max\left(\norm{\nabla_{\vx}}\cR, \gamma_{\max}\right).
-  }
-  \]
-  This ensures that the gradient norm is never greater than $\gamma_{\max}$.
-  \item However, when have vanishing gradients over time, then this means that
-  the RNN is forgetting the past after a few timesteps, and usually then the RNN
-  is not performing very well. This is harder to fix, and we'll see later how
-  this is solved with LSTMS.
-\end{itemize}
 
 \subsubsection{Backprop Over Time}
 
@@ -6804,10 +5954,10 @@ $
 
 \subsubsection{Bi-Directional RNNs}
 
-\begin{center}
-  \includegraphics[width=0.2\linewidth]{%
-img/bi-directional-rnn}
-\end{center}
+\vspace{15 mm}
+
+
+
 
 So, additionally, we're define a \emph{reverse order sequence}
 \[
@@ -6883,25 +6033,7 @@ sequence doesn't get fully of track because of one misprediction.
 
 \sep
 
-\Def[Teacher Forcing] That's why output feedback was introduced, with output
-feedback the output function takes an additional input $\vy^{t-1}$ (for
-unidirectional RNNs) such that we can consider what the previous sequence
-prediction was. So
-\[
-\vy^t=H(\vh^t,\vy^{t-1}).
-\]
-As we can see in the picture we feed in the true value during training, and we
-use the predicted value at test time.
 
-\begin{center}
-  \includegraphics[width=0.3\linewidth]{%
-img/teacher-forcing}
-\end{center}
-
-This technique is called \emph{teacher forcing} (even if we do a wrong
-prediction, we force it to be the true value).
-
-\sep
 
 \Def[Curriculum Learning] Another related idea is \emph{curricular learning}
 where we alternate randomly between teacher forcing and using the actual (and
@@ -7037,33 +6169,6 @@ follows:
 +\vb^\kappa.
 \]
 
-\subsubsection{Other Variants of LSTMs}
-
-\intertitle{LSTMs with Peepholes}
-
-There are a bunch of other LSTMs that have been invented. A change that was done
-with LSTMS was: \emph{LSTS with peepholes} where each of the gates also is
-allowed to look at the memory (Gers \& Schmidhuber, 2000).
-
-\begin{center}
-  \includegraphics[width=1\linewidth]{img/lstm-peephole-connections}
-\end{center}
-
-This makes a lot of sense if we start multiplying by a lot of zeros when we're
-carrying the information out.
-
-\intertitle{Coupled Forget and Input Gates}
-
-\begin{center}
-  \includegraphics[width=1\linewidth]{img/lstm-coupled-forget-and-input-gates}
-\end{center}
-
-Another variation is to use coupled forget and input gates. Instead of
-separately deciding what to forget and what we should add new information to, we
-make those decisions together. We only forget when we’re going to input
-something in its place. We only input new values to the state when we forget
-something older.
-
 \intertitle{GRU Networks (Gated Memory Unit)}
 
 \begin{center}
@@ -7075,6 +6180,65 @@ only one state. Usually these ones tend to be much faster to train. It combines
 the forget and input gates into a single ``update gate.'' It also merges the
 cell state and hidden state, and makes some other changes.
 
+
+\subsection{Differentiable Memory}
+
+\Def[Neural Turing Machine]
+
+NTMs are very reminiscent of a Turing machine, but: each cell $M_i\in\R^d$.
+
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{%
+img/ntms-1}
+\end{center}
+
+In contrast to RNNs, NTMs use an external memory to which they read and write
+according to some determined probabilities.Now here's an example how that can become very useful. We may have these vectors
+in memory, and then we may search for some vector. The greater the dot-product
+is with a vector, the greater our attention will be for that vector in the
+memory (via the attention distribution). 
+
+So the operations that can be done are the following:
+\begin{enumerate}
+  \item Compute the attention distribution: $(\alpha_i)_i$, $\alpha_i\geq 0$
+  s.t. $\sum_{\alpha_i}=1$.
+  \item Read: out expected memory content: $r\gets\sum_i \alpha_iM_i$.
+  \item Write: Now, given that we have one value that we'd like to write, we'll
+  write it to the memory location with the biggest attention:
+  \[
+  (\beta_i)_i,\quad \beta_i\in[0;1],\quad M_i\gets(1-\beta_i)M_i+\beta_iw.
+  \]
+  Usually, there's one value where we have a lot of attention (curse of
+  dimensionality), and lots where we have little attention. Further, as we can
+  see then we'll write a lot so somwhere and a little bit to everywhere else.
+  The reason we're using a slowly varying $\beta_i$ is that we want to be able
+  to take the derivative (if it was just 0 or 1 we couldn't take the
+  derivative). So this is why these things tend to be soft.
+\end{enumerate}
+
+The typical memory controller works as follows:
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{%
+img/ntms-2}
+\end{center}
+
+\begin{enumerate}
+  \item For a \emph{query} vector see which memory cells get the most attention.
+  \item Normalize the attention distribution
+  \item Interpolate the attention with the previous attention
+  \item Convolve the the attention if needed (ability to shift attention
+  relative to content-selected locations)
+  \item additionally sharpen the final attention distribution.
+  \item then do your operation (read or write) according to the attention
+  distribution.
+\end{enumerate}
+
+These operations are all differentiable, as we're using probabilities and not
+only the values 0 or 1. Other resembling architectures are: neural random access
+machines, differentiable data structures (stacks, queues).
+
+Now, NTM architectures can learn loops and simple programs. However, no
+real-world applications have been developed with this so-far.
 \subsubsection{Unsegmented Sequences}
 
 Problem: different durations for same thing
@@ -7281,142 +6445,6 @@ it.''
 clustering algorithm for documents. This is a very useful algorithm if we're
 trying to summarize documents and trying to understand what there is in these
 documents. We'll come to LDA back later.}
-
-\subsection{Density Estimation}
-
-\Def[Density Estimation] is a standard problem in statistics and unsupervised
-learning. It's used to learn the distribution of the data. Classically, we use a
-\emph{parametric family of densities}
-\[
-\dset{p_{\theta}}{\theta\in\Theta}
-\]
-to describe the set of densities that we may model. Usually, the parameters are
-stimated with MLE (expectation w.r.t. the empirical distribution)
-\[
-\theta^*
-=\argmax_{\theta}
-\Exp[\vx\sim p_{\text{emp.}}]{\log(p_{\theta}(\vx))}.
-\]
-
-\sep
-
-However, real data is rarely gaussian, laplacian, \ldots e.g., images. So the
-fact that in general we cannot solve for $p_\theta$ for a parametric function
-makes this task quite complicated.
-
-\ssep
-
-So when using a \emph{prescribed model} $p_\theta$ we have to
-\begin{itemize}
-  \item ensure that $p_\theta$ defines a proper density:
-  \[
-  \int p_\theta(\vx)\,d\vx = 1.
-  \]
-  \item and to be able to evaluate the density $p_\theta$ at various sample
-  points $\vx$
-  \begin{itemize}
-  \item this may be trivial for models such as exponential families (simple
-  formulas)
-  \item but impractical for complex models (Markov networks, DNNs)
-\end{itemize}
-\end{itemize}
-Now, the question is what strategies can we use for more complex models.
-
-\ssep
-
-A typical example for an non-parametric and unnormalized model \todo{but it
-looks normalized?} is kernel-density estimation.
-
-\ssep
-
-\Def[Kernel Density Estimator] Let $\vx_1,\ldots,\vx_n$ be a sample, and $k$ a
-kernel with bandwidth $h>0$ then the estimator is defined as:
-\[
-\overline{p}_\theta(\vx)
-=
-\frac{1}{n}
-\sum_{i=1}^n
-k_h(\vx-\vx_i)
-=
-\frac{1}{nh}
-\sum_{i=1}^n
-k\left(\frac{\vx-\vx_i}{h}\right).
-\]
-
-\ssep
-
-The problem with this is that the rate of convergence is $\log(\log(n))$ - this
-is extremely painfully slow. This is just a guarantee in general when we know
-nothing about our density.
-
-\sep
-
-An alternative is to use \emph{unnormalized models} (non-parametric: the number
-of parameters depends on dataset size). These then represent improper density
-functions:
-\[
-\underbrace{\overline{p}_\theta(\vx)}_{\text{represented}}
-=
-\underbrace{c_\theta}_{\text{unknown}}
-\cdot
-\underbrace{p_\theta(\vx)}_{\text{normalized}}.
-\]
-Finding the normalization constant $c_\theta$ might be really complicated, so we
-can only evaluate relative probabilities. Further, here we cannot use the
-log-likelihood, because scaling up $\overline{p}_\theta$ leads to an unbounded
-likelihood.
-
-\ssep
-
-So the question still is: is there an alternative \emph{estimation method} for
-unnormalized models?
-
-What we do in practice is we do not look for the exact $p_\theta$, but we
-look for properties of $p_\theta$. In many cases these properties depend on our
-prior knowledge of $p_\theta$. We need to understand what the problem is in
-order to put the prior knowledge into the model that we want to do. This was
-already important in supervised learning (e.g., CNNs with several layers for
-images), and is even more important in unsupervised learning. We have to do the
-same thing there without knowing what our final goal is.
-
-\sep
-
-Finally, Hyvarinen came up with the following idea in 2005. He asked himself
-whether there's an \emph{operator} that we can apply to $\overline{p}_\theta$
-that does not depend on normalization. - The answer was yes! Instead of
-estimating $p_\theta$, we estimate $\log p_\theta$. 
-
-\ssep
-
-\Def[Score Matching (Hyvarinen 2005)]
-\[
-\psi_\theta:=
-\nabla_{\vx}\log\overline{p}_\theta,
-\quad
-\psi = \nabla_{\vx}\log p
-\]
-Minimize the criterion
-\[
-J(\theta)
-=
-\Exp{\norm{\psi_\theta - \psi}}^2
-\]
-or equivalently (by eliminating $\psi$ by integration by parts)
-\[
-J(\theta)
-=
-\Exp{\sum_{i}\partial_i\psi_{\theta,\i}-\frac{1}{2}\psi^2_{\theta,i}}.
-\]
-This expectation can be approximated by sampling.
-
-\ssep
-
-\todo{This was not explained in detail!!}
-
-The main problem with this is that it assumes that the two normalization
-constants are the same! \todo{for which two distr?}
-
-\todo{This idea wasn't really explained.}
 
 \subsection{Autoencoders}
 
@@ -7916,7 +6944,6 @@ the pseudo-invers:
 Consequently with the assumption of zero reconstruction error:
 \begin{align*}
 \vmu_{\vz|\vx}
-&\to
 \MW^\dagger(\vx-\vmu)
 \\
 \MSigma_{\vz|\vx}
@@ -8088,79 +7115,6 @@ M_{\rvX}(\vt)
 \exp\left(\vt^\T\vmu+\frac{1}{2}\vt^\T\MSigma\vt\right)
 \]
 
-\subsection{Latent Variable Models}
-
-\subsubsection{DeFinetti's Theorem}
-
-There's another way of at looking at latent variable models which is by the
-DeFinetty exchangeable theorem from the 1930s. This is one of the foundations of
-Bayesian probability (although there is nothing Bayesian in this theorem).
-
-\sep
-
-\Thm[DeFinetti's Theorem] For \emph{exchangeable} data (order of dataset
-doesn't matter and they come from the same distribution), we can decompose
-the data by a \emph{latent variable model}
-\[
-\Prob{\vx_1,\vx_2,\ldots,\vx_N}
-=
-\int
-\prod_{i=1}^N
-\cDist{p_\theta}{\vx_i}{\vz}
-p_\theta(\vz)
-\,
-d\vz.
-\]
-
-\sep
-
-We \emph{expect} that those hidden variables are: interpretable and actionable
-and even show causal relations.
-
-Later we'll put our Bayesian priors into the distributions $\Prob{\vz}$ and we
-then hope that the latent structure will tell us something about the data that
-we didn't know before.
-
-\sep
-
-The follwing paragraph of a paper shows why interpretability is important:
-
-F. Doshi-Veletz et al. (NIPS 2015)
-
-\tcgr{``Objectives such as data exploration present unique challenges and
-opportunities for problems in unsupervised learning. While in more typical scenarios, the
-discovered latent structures are simply required for some downstream task – such
-as features for a supervised prediction problem – in data exploration, the model
-must provide information to a domain expert in a form that they can readily
-interpret. It is not sufficient to simply list what observations are part of
-which cluster; one must also be able to explain why the data partition in that
-particular way. These explanations must necessarily be succinct, as people are
-limited in the number of cognitive entities that they can process at one
-time.''}
-
-\sep
-
-\subsubsection{Latent Variable Models}
-
-Classically we define complex models via the \emph{marginalization} of a
-\emph{latent variable model}
-\[
-p_\theta(\vx)=\int p_\theta(\vx,\vz)\,d\vz
-\text{ or }
-p_\theta(\vx)=\sum_{\vz} p_\theta(\vx,\vz)
-\]
-
-\todo{Complete this!!!}
-
-\todo{Complete this!!!}
-
-\todo{Complete this!!!}
-
-\todo{We didn't get into this. Basically we're trying to get the density of
-$p_\theta(\vx)$, and that is an evidence lower bound that depends on these
-quantities, and if we maximize that given the family restricitions that we
-chose we get that solution.}
-
 \subsubsection{Dimensionality Reduction}
 
 One of the recurring things that we see in all of these models is
@@ -8213,126 +7167,6 @@ or \emph{simulation process}.
   \item sampling is easy: random vector + forward propagation.
 \end{itemize}
 
-\sep
-
-\todo{Write an example of how Latent Dirichlet Allocation works and illustrate
-of how all the complexity is put into the Bayesian prior $\Prob{\vz}$. }
-
-\todo{Write an example of how Latent Dirichlet Allocation works and illustrate
-of how all the complexity is put into the Bayesian prior $\Prob{\vz}$. }
-
-\todo{Write an example of how Latent Dirichlet Allocation works and illustrate
-of how all the complexity is put into the Bayesian prior $\Prob{\vz}$. }
-
-\todo{this was done in the lecture. Then connect it to ELBO}.
-
-\todo{Go to next class and see how it will work.}
-
-\todo{Revisit how you can sample from a uniform distribution in order to get
-samples from a gaussian distribution. (Putting it throug the negative CDF
-something\ldots). This is what the implicit general models are doing, draw a
-sample from a unifform distribution, and then through some nonlinearity we'll
-get sample from some other complicated distribution. Until very recently
-generative models were like this. We were able to understand what was coming
-out because we designed it the way we chose. Now, since we put the complexity
-in the othe term, we have no means to interpret the compression, but it gives
-us a universal approximator. This also shows the big risk that we have with the
-implicit models, we cannot understand the latent representation, and we may not
-understand the data that we get out of it - we don't know how good they are.
-Usually, we don't have this nice conjugate prior setting either. Then to get
-the posterior, we need to do sampling, or the variational approximation that we
-skipped before (ELBO) method. TODO: find out what is the likelihood, posterior,
-prior and the marginal likelihood (or evidence of the model) and connect it to
-ELBO. That's just the previous way of doing things that is still very useful,
-and then say which is the new way of doing things (i think it's implicit
-models) and it looks promising.}
-
-\todo{Write here what I've found from the assignment exercise}
-
-\section{Chain-Rule and Jacobians for Tensors}
-
-\Def[$k$-Dimensional Tensor]
-$
-\TT\in\R^{d_1\times d_2\times \cdots\times d_k}
-$
-
-\sep
-
-\Def[Tensor Multiplication]
-
-$
-\underset{\in\R^{(a+c)}}{\TT}
-=
-\underset{\in\R^{(a+b)}}{\TP}
-\times_b
-\underset{\in\R^{(b+c)}}{\TQ}
-$ \todo{Dimensions wrong on this line}
-
-\begin{gather*}
-\begin{align*}
-\underset{
-r_1\times \cdots\times r_a
-\times 
-s_1\times\cdots\times s_c
-}{\TT}
-=
-\underset{
-r_1\times \cdots\times r_a
-\times 
-s_1\times\cdots\times s_b
-}{\TP}
-\times_{s_1,\ldots,s_b}
-\underset{
-s_1\times\cdots\times s_b
-\times
-t_1\times\cdots\times t_c
-}{\TQ}
-\end{align*}
-\end{gather*}
-
-where each entry of $\TT$ is computed as follows:
-
-$
-T_{i_1,\ldots,i_a,k_1,\ldots,k_c}
-:=
-\sum_{j_1,\ldots,j_b}
-P_{i_1,\ldots,i_a,j_1,\ldots,j_b}
-Q_{j_1,\ldots,j_b,k_1,\ldots,k_c}
-$
-
-Note that this is just the sum of the multiplications of two numbers which are
-in corresponding locations in $\TP$ and $\TQ$. Essentially, it's the dot product
-across the dimensions $s_1,\ldots,s_b$.
-
-Note how this tensor-tensor-multiplication is isomorphic to some matrix-matrix
-product:
-\begin{gather*}
-T_{\underbrace{i_1,\ldots,i_a}_{\text{``i''}},
-\underbrace{k_1,\ldots,k_c}_{\text{``k''}}}
-:=
-\sum_{\underbrace{j_1,\ldots,j_b}_{\text{``j''}}}
-P_{\underbrace{i_1,\ldots,i_a}_{\text{``i''}},
-\underbrace{j_1,\ldots,j_b}_{\text{``j''}}}
-Q_{\underbrace{j_1,\ldots,j_b}_{\text{``j''}},
-\underbrace{k_1,\ldots,k_c}_{\text{``k''}}}
-\end{gather*}
-
-\sep
-
-\Thm[Tensor Chain Rule] 
-
-$y(W)\colon\R^{d_1\times d_2}\to\R^{d_3\times d_4}$, $L(y)\colon\R^{d_3\times d_4}\to\R$
-
-$
-\frac{\partial L}{\partial W}=\frac{\partial L}{\partial
-W}\times_{d_3,d_4}\frac{\partial y}{\partial W}
-$
-\quad then we have: 
-$
-T_{i,j,k,l}=\frac{\partial y_{i,j}}{\partial W_{k,l}}
-$
-
-\todo{Write Chain Rule Here}
 
 \section{Generative Models}
 
@@ -8351,173 +7185,7 @@ In some way or another, any generative model has to cope with density
 estimation (which is the hard task). This problem is tackled in different
 ways by the several flavours of generative models:
 
-\begin{center}
-  \includegraphics[width=0.7\linewidth]{%
-img/taxonomy-of-generative-models}
-\end{center}
 
-\begin{itemize}
-  \item \textbf{explicit density estimation:} explicitly define and solve for
-  $p_{\text{model}}(\vx)$
-  \begin{itemize}
-    \item \textbf{tractable} we can comute $p_{\text{model}}(\vx)$
-    \item \textbf{approximate} we approximate $p_{\text{model}}(\vx)$ in some
-    way
-  \end{itemize}
-  \item \textbf{implicit density estimation:} learn a model that can sample from
-  $p_{\text{model}}(\vx)$ without explicitly defining it.
-\end{itemize}
-
-\subsection{Noise Contrastive Estimation (NCE)}
-
-Approach: Reduce unsupervised problem of estimating $p(\vx)$ to binary
-classification problem. The MLE of the classification problem is asymptotically
-consistent with estimator of original problem. Asymptotically consistent: with
-increasing number of datapoints, the resulting estimates become more and more
-concentrated near the true value of the estimated parameter.
-
-\sep
-
-Noise contrastive estimation is an explicit density estimation method. It works
-by turing a unnormalized probability distribution into a normalized probability
-distribution. Instead of computing the partition function NCE solves the
-normalization probelm by extending everything to a joint distribution which has
-a switch variable that selects either the real distribution or a noise
-distribution. The same thing is done for the training distribution. Then
-everything is trained using MLE.
-
-\sep
-
-Many probabilistic models are defined by an unnormalized probability
-distribution $\tilde{p}(\vx;\theta)$. We must normalize $\tilde{p}$ by dividing
-by a partition function $Z(\theta)$ to obtain a valid probability distribution
-
-$
-p(\vx;\theta)
-=
-\frac{1}{Z(\theta)}\tilde{p}(\vx;\theta).
-$
-
-The partition function is an integral or sum over the unnormalized probability
-of all states: $Z(\theta)=\int_{\cX} \tilde{p}(\vx)\,d\vx$. This operation is
-intractable in many cases.
-
-So what makes learning undirected models by maximum likelihood particularly
-difficult is that the partition function depends on the parameters. Thus, the
-gradient of the log-likelihood w.r.t. the parameters has a term corresp. to the
-gradient of the partition function:
-
-$
-\nabla_{\theta}\log(p(\vx;\theta))
-=
-\nabla_{\theta}\log(\tilde{p}(\vx;\theta))
--\nabla_{\theta}\log(Z(\theta)).
-$
-
-This is a well-known decomposition into the \emph{positive phase} and the
-\emph{negative phase} of learning.
-
-\sep
-
-Most techniques for estimating modesl with an intractable partition function do
-not provide an estimate of the partition function.
-
-\textbf{Noise Constrastive Estimation (NCE)} takes a different strategy: In this
-approach, the probability distribution estimated by the model is represented
-explicitly as
-
-$
-\log(p_{\text{model}}(\vx))
-=
-\log(\tilde{p}(\vx;\theta)) +\underbrace{c}_{\mathclap{=-\log(Z(\theta))}}.
-$
-
-So we have the relationship
-
-$
-\frac{1}{Z(\theta)}=e^{c}.
-$
-
-Now, rather than estimating only $\theta$, NCE treats $c$ as just another
-parameter and estimates $\theta$ and $c$ simultaneously, using the same
-algorithm for both. The resulting $\log(p_{\text{model}}(\vx))$ may thus not
-correspond exactly to a valid probability distribution, but it will become
-closer and closer to being valid as the estimate of $c$ improves.
-
-We cannot optimize this with MLE, because MLE would just set $c$ arbitrarily
-high. (we want: $c$ to be s.t. we get a valid probability distr.)
-
-NCE works by reducing the unsupervised learning problem of estimating $p(\vx)$
-to that of learning a probabilistic binary classifier in which one of the
-categories corresponds to the data generated by the model. This supervised
-learning problem is constructed in such a way that the MLE defines an
-asymptotically consistent estimator of the original problem.
-
-Specifically, we introduce a second distribution, the \emph{noise contrastive
-distribution} $p_\text{noise}(\vx)$. The noise distribution should be tractable
-to evaluate and to sample from. We can now construct a model over both $\vx$ and
-a new \emph{binary} class variable $y\sim Be(p)$. In the new joint probability
-model we specify that
-\begin{align*}
-p_{\text{joint}}(y=1)&=p_{\text{joint}}(y=0)=\frac{1}{2}
-\\
-p_{\text{joint}}(\vx|\vy=1)&=p_{\text{model}}(\vx)=e^c\tilde{p}(\vx;\theta)
-\\
-p_{\text{joint}}(\vx|\vy=0)&=p_{\text{noise}}(\vx)
-\end{align*}
-In other words, $y$ is a switch variable that determines whether we will
-generate $\vx$ from the model or from the noise distribution.
-
-We can construct a similar joint model $p_{\text{train}}$ of the training data.
-In this case, the switch variable $y$ determines whether we draw $\vx$ from the
-data or from the noise distribution. Formally,
-\begin{align*}
-p_{\text{train}}(y=1)&=p_{\text{train}}(y=0)=\frac{1}{2}
-\\
-p_{\text{train}}(\vx|y=1)&=p_{\text{data}}(\vx)
-\\
-p_{\text{train}}(\vx|y=0)&=p_{\text{noise}}(\vx)
-\end{align*}
-We can now just use standard maximum likelihood learning on the
-\emph{supervised} learning problem of fitting $p_{\text{joint}}$ to
-$p_{\text{train}}$.
-\[
-(\theta^*,c^*)
-=
-\argmax_{\theta,c}
-\Exp[\vx,y\sim p_{\text{train}}]{\log\left(p_{\text{joint}}(y|\vx)\right)}.
-\]
-\todo{Which distribution is used here in the expectation? Conditional or joint?}
-
-The distribution $p_{\text{joint}}$ is essentially a logistic regression model
-applied to the difference in log probabilities of the model and the noise
-distribution:
-\begin{gather*}
-\begin{align*}
-p_{\text{joint}}(y=1|\vx)
-&=\frac{p_{\text{model}}(\vx)}{p_{\text{model}}(\vx)+p_{\text{noise}}(\vx)}
-\\
-&=\frac{e^c\tilde{p}_{\text{model}}(\vx)}{
-e^c\tilde{p}_{\text{model}}(\vx)+p_{\text{noise}}(\vx)}
-\\
-&=\sigma(\log(p_{\text{model}}(\vx))-\log(p_{\text{noise}}(\vx))).
-\end{align*}
-\end{gather*}
-
-Now, the estimate $p_{\text{joint}}(\vx)$ is bayes optimal if
-\[
-e^c\tilde{p}_{\text{model}}(\vx;\theta)=p_{\text{data}}(\vx)
-\]
-Hence, optimizing the upper loss will yield us the right $c$ and $\theta$.
-\sep
-
-\Thm The estimator for $\theta$ is consistent.
-
-\Thm The estimator for $\theta$ is generally not statistically efficient.
-
-\sep
-
-\todo{Say why NCE is not the final answer}
 
 \subsection{Variational Autoencoders (VAEs)}
 
@@ -8687,7 +7355,7 @@ you'd just have to put a sum over all the instances in front of everything)
   This term ensures that we reconstruct the data well.
   \item This KL term (between Gaussians for encoder and $\vz$ prior) has a nice
   closed-form solution.\\
-  \todo{Write down what it is!}\\
+
   This term ensures that the approximate posterior distribution is close to
   prior.
   \item $\cDist{p_\theta}{\vz}{\vx}$ is intractable (as seen earlier). But we
@@ -8707,9 +7375,7 @@ and we can take its gradient to optimize:
 $
 (\theta^*,\phi^*)=\argmax_{(\theta,\phi)}\sum_{i=1}^n\cL(\vx^{(i)},\theta,\phi).
 $
-
 \sep
-
 \textbf{Reparametrization Trick}
 Can make sampling differentiable with
 \textbf{$z \sim \mathcal{N}(\mu, \Sigma ) $}
@@ -8926,9 +7592,7 @@ Nash equilibrium (where both players stop adapting themselves).
 Estimating this ratio using supervised learning is the key approximation
 mechanism used by GANs.
 
-\todo{Maybe relate this to other ratios where $\alpha\neq 1$. Implicit Models}
 
-\todo{Why did we want to show this??}
 
 What assumptions are needed to obtain this solution?
 
