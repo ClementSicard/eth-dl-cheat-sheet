@@ -7114,76 +7114,6 @@ So the next idea is after having the sequence $\pi_1,\ldots,\pi_T$ of
 predictions we'll add all the potential probabilities that actually mean the
 same thing.
 
-\todo{I didn't understand this!!!}
-
-\todo{I didn't understand this!!!}
-
-\todo{I didn't understand this!!!}
-
-\todo{I didn't understand this!!!}
-
-\todo{I didn't understand this!!!}
-
-
-\subsection{Differentiable Memory}
-
-\Def[Neural Turing Machine]
-
-NTMs are very reminiscent of a Turing machine, but: each cell $M_i\in\R^d$.
-
-\begin{center}
-  \includegraphics[width=0.7\linewidth]{%
-img/ntms-1}
-\end{center}
-
-In contrast to RNNs, NTMs use an external memory to which they read and write
-according to some determined probabilities.Now here's an example how that can become very useful. We may have these vectors
-in memory, and then we may search for some vector. The greater the dot-product
-is with a vector, the greater our attention will be for that vector in the
-memory (via the attention distribution). 
-
-So the operations that can be done are the following:
-\begin{enumerate}
-  \item Compute the attention distribution: $(\alpha_i)_i$, $\alpha_i\geq 0$
-  s.t. $\sum_{\alpha_i}=1$.
-  \item Read: out expected memory content: $r\gets\sum_i \alpha_iM_i$.
-  \item Write: Now, given that we have one value that we'd like to write, we'll
-  write it to the memory location with the biggest attention:
-  \[
-  (\beta_i)_i,\quad \beta_i\in[0;1],\quad M_i\gets(1-\beta_i)M_i+\beta_iw.
-  \]
-  Usually, there's one value where we have a lot of attention (curse of
-  dimensionality), and lots where we have little attention. Further, as we can
-  see then we'll write a lot so somwhere and a little bit to everywhere else.
-  The reason we're using a slowly varying $\beta_i$ is that we want to be able
-  to take the derivative (if it was just 0 or 1 we couldn't take the
-  derivative). So this is why these things tend to be soft.
-\end{enumerate}
-
-The typical memory controller works as follows:
-\begin{center}
-  \includegraphics[width=0.5\linewidth]{%
-img/ntms-2}
-\end{center}
-
-\begin{enumerate}
-  \item For a \emph{query} vector see which memory cells get the most attention.
-  \item Normalize the attention distribution
-  \item Interpolate the attention with the previous attention
-  \item Convolve the the attention if needed (ability to shift attention
-  relative to content-selected locations)
-  \item additionally sharpen the final attention distribution.
-  \item then do your operation (read or write) according to the attention
-  distribution.
-\end{enumerate}
-
-These operations are all differentiable, as we're using probabilities and not
-only the values 0 or 1. Other resembling architectures are: neural random access
-machines, differentiable data structures (stacks, queues).
-
-Now, NTM architectures can learn loops and simple programs. However, no
-real-world applications have been developed with this so-far.
-
 \subsection{Attention Mechanisms}
 
 \Def[Attention Mechanisms] offer a simple way to overcome some challenges of
@@ -8781,8 +8711,13 @@ $
 \sep
 
 \textbf{Reparametrization Trick}
-
-\todo{Write it down here!!}
+Can make sampling differentiable with
+\textbf{$z \sim \mathcal{N}(\mu, \Sigma ) $}
+is equivalent to 
+\textbf{$z = \mu + \Sigma ^{1/2} \eta$}, \textbf{$\eta \sim \mathcal{N} (0,I)$}.
+One can now backpropagate w.r.t. \textbf{$\mu$ and $\Sigma ^{1/2}$}\\
+Can be generalized: f smooth and integrable, then
+$\nabla _\mu \Exp{f(z)} = \Exp{\nabla _z f(z)}$, $\nabla _\Sigma \Exp{f(z)} = \dfrac{1}{2} \Exp{\nabla ^2 _z f(z)}$
 
 \sep
 
@@ -8803,17 +8738,6 @@ to the parameters $\theta$ and $\phi$ via backpropagation.
 \textbf{Generating Data} Here we just sample from the prior, and pass it through
 the decoder network to get the posterior distribution's parameters, then we
 sample from that one.
-
-\begin{center}
-  \includegraphics[width=0.5\linewidth]{%
-img/VAE-generation}
-\end{center}
-
-\subsection{Deep Latent Gaussian Models}
-
-
-
-
 
 
 \subsection{Generative Adversarial Networks (GANs)}
@@ -9046,15 +8970,12 @@ So we alternate between
   $
 \end{itemize}
 
-\ssep
-
-Note that this training algorithm uses a heuristically motivated loss (that is
-a bit different) for the generator to have better gradients when the
-discriminator is good:
-
+\sep
 \begin{center}
   \includegraphics[width=1\linewidth]{%
-img/GAN-training}
+img/gan_cl_prblm.png}
+  \includegraphics[width=1\linewidth]{%
+img/js_divergence.png}
 \end{center}
 
 \sep
