@@ -2167,6 +2167,11 @@ $
 =\MX^\T
 $ \todo{verify}
 
+\todo{Are there any general rules for transposes??}
+
+\section{Intro}
+
+Perceptron + Hopfield Network + MLP
 
 \section{General Machine Learning}
 
@@ -2247,178 +2252,6 @@ $M=\frac{1}{2}(P+Q)$
 \Com The JSD is a symmetrized and smoothed version of the KL-divergence.
 
 \sep
-
-
-\section{Connectionism}
-
-\subsection{McCullogh-Pitts Neuron}
-
-$
-f(x;\sigma,\theta) =
-\begin{cases} 
-      1 & \sum_{i=1}^n{\sigma_i x_i} \geq \theta \\
-      0
-   \end{cases}
-$ 
-
-$
-x \in \{0,1\}^n, \quad
-\sigma \in \{-1,+1\}^n, \quad
-\theta \in \Z
-$
-
-Neuron as (linear) boolean functions, no learning rule
-
-\subsection{Turing unorganized machine}
-Type A :
-
-Networks of NAND units operating in a clocked fashion
-
-$
-y(t+1) = 1 - x_1(t) x_2(t) , \quad
-x_1(t),x_2(t) \in \{0,1\}
-$
-
-Type B : controllable links, can make an universal machine
-
-\subsection{Hebbian learning}
-
-Cells that fire together wire together
-
-$
-\text{Naive Hebb rule : } 
-\Delta \theta_{i j}^t \propto x_i^t x_j^t
-$
-
-$
-\text{Covariance learning rule : } 
-\Delta \theta_{i j}^t =
-(x_i^t - \E[x_i]) ( x_j^t - \E[x_j])
-$
-
-= neural mechanism to extract correlations
-
-\subsection{Perceptron}
-
-$
-\text{Inputs } x \in \R^n; \text{Weights } \theta \in \R^n
-$
-
-$
-\text{Unit : }
-(x,\theta) \rightarrow \sign(x \cdot \theta) =
-\begin{cases} 
-      +1 & x \cdot \theta \geq 0 \\
-      -1
-   \end{cases}
-$ 
-
-$
-\text{Update : }
-\Delta \theta = 
-\begin{cases} 
-      0 & y \sign(x \cdot \theta) \geq 0 \\
-      y x
-   \end{cases}
-$ 
-
-Update direction is $x$, zigzag a lot
-
-Let $(x^t,y^t)$ be a sequence of perceptron mistakes, inducing updates $\Delta \theta^t, \Delta \theta = \sum_{t=1}^s \Delta \theta^t$ then $||\theta^s||^2 \leq \sum_{t=1}^s ||x^t||^2$
-
-Proof by induction : $||\theta^{t+1}|| = ||\theta^{t}|| + 2 y^t x^t \cdot \theta^t + ||x^t||^2$ 
-
-Corollary : if $||x^t|| \leq R$ then $||\theta^s|| \leq R \sqrt{n}$
-
-Linearly $\gamma$-separable : $
-\exists \theta, ||\theta||=1 :
-y_i x_i \cdot \theta \geq \gamma > 0 \forall i
-$
-
-Novikoff's Theorem : at most 
-$s \leq \left( \frac{R}{s} \right)^2$ steps
-
-Proof : $\gamma s \leq \sum_{t=1}^s \Delta \theta^t \cdot \theta^*
-= \theta^s \cdot \theta^* \leq ||\theta^s|| \leq R \sqrt{s}
-$
-
-Cover theorem : $C(s+1, n) = C(s,n) + C(s, n-1)$
-
-$\frac{C(s,n)}{2^n} =
-\begin{cases} 
-      1 \quad\quad\quad\quad\quad\;\, s \leq n,
-      & \frac{1}{2} \quad\quad\quad\quad s = 2n \\
-      1 - O(e^{-n}) \quad n < s < 2n,
-      & O(e^{-n}) \quad\;\, s > 2n\\
-   \end{cases}
-$
-
-\subsection{Willshaw theory}
-
-n-sparse vectors : $\B_n^N =
-\left\{
-x \in \{ 0,1 \}^N : \sum_{i=1}^N x_i = n
-\right\}$
-
-binary memory matrix : $\Theta \in \{0, 1\}^{N \times N}$, $N^2$ bits capacity
-
-$\Theta = \min \{1, \sum_{t=1}^s y^t {x^t}^T \}$, $z = \Theta x$, $\hat{y}_j = 1$ if $z_j \geq n$
-
-$P(\theta_{i j} = 0) = q^s, P(\theta_{i j} = 1) = 1 - q^s,
-q = 1 - \frac{n^2}{N^2}$
-
-In the limit bits within a row and error probabilities become independent : 
-
-$
-P(\hat{y_i} = 1 | y_i = 0 ) \approx (1 - q^s)^n,
-P(\text{erorr}) \approx N(1 - q^s)^n
-$
-
-sparsness scale : $n \propto \log(N)$, subopti. by $\log(2) \approx 0.693$
-
-\subsection{Hopfield network}
-
-symmetric, irreflexive ($\theta_{ii} = 0$)
-
-reccurent dynamics : $x_i \leftarrow \sign \left( \sum_{j \neq i} \theta_{i j} x_j \right) $
-
-\begin{itemize}
-    \item Asynchronous updates with $\theta_{ij} = \theta_{ji}$, updates converge to a stable state
-    \item Synchronous updates with $\theta_{ij} = \theta_{ji}$, updates converge to a stable state or a limit cycle of length $2$.
-\end{itemize}
-
-\Def[Hebbian Hopfield Memory]: 
-
-$\Theta \propto \sum_{t=1}^s [x^t {x^t}^T - I], \quad
-\Tilde{x}_1 = \sign(\Theta \Tilde{x}_0)$
-
-With single pattern $x$ and $\Tilde{x}$ with Hamming distance $n$, if $n < \frac{N}{2}$ we retrieve $x$ otherwise $-x$, the Hamming network is "sign-blind"
-
-Capacity can be estimated as $\frac{s}{N} \leq \alpha^* \approx 0.138 $
-
-Hopfield maximal capacity :
-linear classifier per bit position, $\alpha^* = 2$, more than 10 times better than with the Hebb rule
-
-\subsection{Multi Layer Perceptron}
-
-Three layer reference :
-$
-f(x;\beta;\theta) =
-\sum_{j=1}^M \frac{\beta_j}{1 + \exp[-\theta_j \cdot x]}
-$
-
-$
-\frac{\partial \frac{1}{2} (f(x) -y)^2 }{\partial \beta_j} = 
-\frac{f(x) - y}{1 + \exp[-\theta_j \cdot x]}
-$
-
-$
-\frac{\partial \frac{1}{2} (f(x) -y)^2 }{\partial \theta_{i j}} = 
-\frac{f(x) - y}{1 + \exp[-\theta_j \cdot x]} \cdot
-\frac{-\beta_j x_i}{1 + \exp[\theta_j \cdot x]}
-$
-
-
 
 \section{Sigmoid Networks}
 
@@ -2787,6 +2620,7 @@ $
 $
 
 \sep
+
 \begin{align*}
 \tanh(x)
 &=\frac{e^x-e^{-x}}{e^x+e^{-x}}
@@ -3192,24 +3026,25 @@ functions
 \ssep
 
 \Proof This just follows from the upper relationship
-\begin{tightcenter}
-$
+\begin{align*}
 \evalat{(\MJ_{H\circ G})_{ij}}{\vx=\vx_0}
-=
+&=
 \evalat{\frac{\partial (H\circ G)_i}{\partial x_j}}{\vx=\vx_0}
-=
+\\
+&=
 \sum_{k=1}^q
 \left.\frac{\partial H_i}{\partial z_k}\right|_{\vz=G(\vx_0)}
 \cdot
 \left.\frac{\partial G_k}{\partial x_j}\right|_{\vx=\vx_0}
-=
+\\
+&=
 \evalat{(\MJ_H)_{i,:}}{\vz=G(\vx_0)}
 \evalat{(\MJ_{G})_{:,j}}{\vx=\vx_0}
-=
+\\
+&=
 \evalat{(\nabla_{\vz} H_i)^\T}{\vz=G(\vx_0)} 
 \evalat{(\MJ_{G})_{:,j}}{\vx=\vx_0}
-$
-\end{tightcenter}
+\end{align*}
 
 \subsection{Special Case: Function Composition}
 
@@ -3222,10 +3057,9 @@ h\colon\R^m\to\R,
 h\circ G\colon\R^n\to\R
 \]
 And let's use the more intuitive variable notation
-$
+\[
 \vx\stackrel{G}{\mapsto}\vy\stackrel{h}{\mapsto}z
-$
-
+\]
 Then we have that
 \[
 \nabla_{\vx}z = \sum_{k=1}^m\frac{\partial z}{\partial
@@ -3671,7 +3505,7 @@ $\vw_1,\vw_2$.
 
 \sep
 
-\Thm[Lebesgue] Given a continuous p.w. linear function in $\R^n$, we can represent the
+\Thm Given a continuous p.w. linear function in $\R^n$, we can represent the
 function as
 
 $
@@ -3838,17 +3672,7 @@ for two reasons:
 
 \subsection{Objectives as Expectations}
 
-
-The typical structure of a learning objective in a NN is a \emph{large finite
-sum} (over all training instances). Accuracy-complexity trade-off: in practice
-we subsample terms in the sum, by using \emph{mini-batches} of the training data 
-(so we'll get something close to the true gradient - but not exactly). The idea
-behind it, is that everything will work out in expectation. Further, we favour
-cheap and imprecise computations over many datapoints rather than precise and
-expensive computations over a few datapoints.
-
-\begin{tightcenter}
-$
+\[
 \nabla_{\theta}\cR(D)
 =
 \Exp[\cS_N\sim p_D]{\nabla_{\theta}\cR(\cS_N)}
@@ -3858,8 +3682,15 @@ $
 \sum_{i=1}^N
 \nabla_{\theta}\cR(\theta;\set{\vx[i],\vy[i]})
 }
-$
-\end{tightcenter}
+\]
+
+The typical structure of a learning objective in a NN is a \emph{large finite
+sum} (over all training instances). Accuracy-complexity trade-off: in practice
+we subsample terms in the sum, by using \emph{mini-batches} of the training data 
+(so we'll get something close to the true gradient - but not exactly). The idea
+behind it, is that everything will work out in expectation. Further, we favour
+cheap and imprecise computations over many datapoints rather than precise and
+expensive computations over a few datapoints.
 
 \subsection{Gradient Descent}
 
@@ -4123,6 +3954,11 @@ descent in this setting. And if we respect the rule of choosing the learning
 rate as $\eta=\frac{1}{L}$ where $L$ is the Lipschitz-constant of the function,
 then usually, we're fine.
 
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{%
+img/challenge-curvature}
+\end{center}
+
 So the problem is if we have sharp nonlinearities, then there are two
 approaches to solve this
 \begin{itemize}
@@ -4243,10 +4079,9 @@ so we're taking the expectation with regard to the empirical distribution
 
 Now, to make things simpler, we assume that the inputs are whitened, that means
 that
-$
+\[
 \Exp{\vx\vx^\T}=\MI
-$
-
+\]
 So if the mean $\mu=\vo$, then our input is uncorrelated, and every feature is
 of variance 1.
 \todo{I don't get this??}
@@ -4355,16 +4190,15 @@ $\rvV$ \emph{at random}, such that
 So, the randomization scheme is unbiased.
 
 So SGD works via subsampling. So we pick a random subset
-$
+\[
 \cS_K\subseteq\cS_N,\qquad K\leq N.
 \quad
 (\text{usually }K\ll N)
-$
-
+\]
 And since we're picking $\cS_K$ at random, note how
-$
+\[
 \Exp{\cR(\cS_K)}=\cR(\cS_N)
-$
+\]
 And thus it also holds for the gradient that
 \[
 \nabla_{\theta}\Exp{\cR(\cS_K)}
@@ -5499,7 +5333,7 @@ the network to come to the right prediction at some point and it may recover
 from the small errors.
 
 
-\subsection{Memory}
+\subsection{Memory \& Attention}
 
 \textbf{Problem with RNNs:} vanishing gradients (changes in the input a long
 time ago won't really affect the output/loss), so it's hard to learn long-term
@@ -5520,8 +5354,13 @@ It would be nice to have something like a gated unit
 The following picture illustrates how we have a memory unit where we can store,
 read and delete information illustrated by the \emph{gated units}.
 
+\begin{center}
+  \includegraphics[width=0.6\linewidth]{%
+img/memory-units}
+\end{center}
+
 Advantages: information can be remembered for a long time (doesn't fade away as
-with RNNs). Further, we can delete something in memory in one 1 step
+with RNNs). Further, we can delete something in memory in one timestep
 (without having to fade it out). 
 
 \sep
@@ -5895,12 +5734,11 @@ around the optimal $\theta^*$ would be
 \qquad\qquad(\star)
 \end{align*}
 where $\MH_{\cR}$ is the hessian of $\cR$, so
-$
+\[
 (\MH_{\cR})_{i,j}
 =
 \frac{\partial^2 \cR}{\partial \theta_i \partial \theta_j}
-$
-
+\]
 and $\MH$ is the evaluation of $\MH_{\cR}$ at $\theta^*$:
 $
 \MH := \MH_{\cR}(\theta^*)
@@ -6336,15 +6174,10 @@ $
 
 \subsubsection{Double Descent}
 
-\Def[Double Descent] is when test error of a model initially decreases due to learning, then increases with overfitting, then decreases again in the over-parameterized regime (as the capacity of the model grows). Moment of second descent is called \textbf{interpolation threshold}.
+\Def[Double Descent] is when test error of a model initially decreases due to learning, then increases with overfitting, then decreases again in the over-parameterized regime (as the capacity of the model grows). Moment of second descent is called \textbf{interpolation threshold}
+
 
 \section{Attention}
-
-\begin{center}
-  \includegraphics[width=0.7\linewidth]{%
-img/transformer.png}
-\end{center}
-
 
 \Def[Attention Mechanisms] offer a simple way to overcome some challenges of
 RNN-based memorization. With attention mechanisms, we selectively attend to
@@ -6361,7 +6194,7 @@ Both ideas can be combined!
 $\left.F\left(\boldsymbol{\xi},\left(\mathbf{h}_e^1, \ldots, \mathbf{h}_e^s\right)\right)=\left[
 \mathbf{h}_e^1, \mathbf{h}_e^2,\ldots,\mathbf{h}_e^s\right] \cdot f_\phi\left(\boldsymbol{\xi},\left(\mathbf{h}_e^1, \ldots, \mathbf{h}_e^s\right)\right)\right)$
 
-\Def[Self Attention] is an operation extensively used in the Transformer model. It helps to capture relations between words in a sentence, hence help to better encode the word. It maps a sequence of $L$ vectors $\vx_1,...,\vx_L$ with $\vx_i\in\mathbb{R}$ to a sequence of $L$ vectors $\vy_1,...,\vy_L$ by taking the weighted average of the input
+\Def[Self Attention] is an operation extensively used in the Transformer model. It helps to capture relations between words in a sentence, hence help to better encode the word. It maps a sequence of vectors $\vx_1,...,\vx_L$ with $\vx_i\in\mathbb{R}$ to a sequence of vectors $\vy_1,...,\vy_L$ by taking the weighted average of the input
 
 $$
 \vy_i = \sum_{j=1}^{L}\vw_{ij}\vx_{j}
@@ -6376,15 +6209,15 @@ $$
 Can be easily calculated with matrix multiplication: let $\MQ=\MX\MW^Q$, $\MK=\MX\MW^K$, and $\MV=\MX\MW^V$, then:
 
 \begin{tightcenter}
-$\MY = \softmax\left( \frac{\MQ\MK^\top}{\sqrt{d_k}} \right) \MV$
+$\MZ = \softmax\left( \frac{\MQ\MK^\top}{\sqrt{d_k}} \right) \MV$
 \end{tightcenter}
 
-with, for $\MW_\vq,\MW_\vk,\MW_\vv \in \R^{d \times d}$: 
+with: 
 
 \begin{itemize}
-    \item $\MQ = \MX\MW_\vq$: information about the word in relation to others
-    \item $\MK = \MX\MW_\vk$: how a word influences others 
-    \item $\MV = \MX\MW_\vv$: how a word sees itself
+    \item $\MQ$: information about the word in relation to others
+    \item $\MK$: how a word influences others 
+    \item $\MV$: how a word sees itself
 \end{itemize}
 
 \subsubsection{Performance of Self-Attention}
@@ -6395,7 +6228,7 @@ with, for $\MW_\vq,\MW_\vk,\MW_\vv \in \R^{d \times d}$:
     \item \textbf{CNN}: Comp. per layer: $\mathcal{O}(knd^2)$, Seq. operations: $\mathcal{O}(1)$, Max. Path length: $\mathcal{O}(\log_k(n))$
 \end{itemize}
 
-\Def[Multi-head attention] is a module for attention mechanisms which runs through an attention mechanism several times in parallel. The independent attention outputs are then concatenated and linearly transformed into the expected dimension. Intuitively, multiple attention heads allows for attending to parts of the sequence differently (e.g. longer-term dependencies versus shorter-term dependencies). In practice, we use $\MW_{\{\vq, \vk, \vv\}} \in \R^{d\times hd}$, with $h$ the number of heads. We then have $\MY \in \R^{L\times hd}$
+\Def[Multi-head attention] is a module for attention mechanisms which runs through an attention mechanism several times in parallel. The independent attention outputs are then concatenated and linearly transformed into the expected dimension. Intuitively, multiple attention heads allows for attending to parts of the sequence differently (e.g. longer-term dependencies versus shorter-term dependencies).
 
 \sep
 \subsection{BERT}
@@ -6408,6 +6241,11 @@ with, for $\MW_\vq,\MW_\vk,\MW_\vv \in \R^{d \times d}$:
 \end{itemize}
 
 Models based on Transformers: BERT (only encoding), GPT-x, DALL-E
+
+\begin{center}
+  \includegraphics[width=1\linewidth]{%
+img/self-attention.png}
+\end{center}
 
 \subsubsection{Seq2Seq with Attention}
 
@@ -6434,6 +6272,11 @@ Inside each encoder/decoder layer, we have the following structure (from bottom 
     
 \end{itemize}
 
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{%
+img/transformer.png}
+\end{center}
+
 \sep
 Attention learns to index, multiplicative gating to combine bottom-up and top-down information
 
@@ -6450,52 +6293,6 @@ Attention learns to index, multiplicative gating to combine bottom-up and top-do
 \Def[3 types of problems for GNNs]: Node classification, graph classification and link prediction
 
 \Def[Applications of GNNs]: Semi-supervised learning, recommender systems, molecule classification, 
-
-\section{Adversarial Examples}
-
-\Def[Adversarial Example]: We have a loss function $\ell : \R^K\times\R^K\rightarrow\R$. Fix an image $\vx$ and its one-hot encoded label $\vy$.
-
-While assuming $f_\theta$ is a trained model, the perturbation for a wrong perturbation is 
-
-$\vr^*=\argmax_{\lVert r \rVert \leq \epsilon} \ell(f_\theta(\vx+\vr), \vy)$
-
-\Thm[Projected Gradient Ascent] Standard attack in the litterature.
-
-We iteratively optimize the perturbation $\vr$ using
-
-$\vr^{(i+1)} = \Pi\left(\vr^{(i)} + \evalat{\nabla_\vr \ell(f_\theta(\vx + \vr), \vy)}{\vr=\vr^{(i)}}\right)$
-
-$\Pi$ is a projection, ensuring that $\lVert\Pi(\vr)\rVert \leq \epsilon$
-
-\sep
-
-\Thm[DeepFool] We want to solve $\argmin_{r}{\lVert r \rVert_p}$ s.t. $k(x + r) \neq k(x)$
-
-Iteratively:
-
-$r_{i + 1}^* = \argmin_{r_{i + 1}}{\lVert r_{i + 1} \rVert_2}$ s.t. 
-
-$\left(\nabla_x f_{1}(x_i) - \nabla_x f_{2}(x_i) \right) ^\top r_{i+1} + f_1(x_i) - f_{2}(x_i) < 0$
-
-with $f_i$ the $i$-th logit
-
-\begin{itemize}
-    \item For SOTA image classifiers, converges in $2$ or $3$ iterations, while giving competitive results compared to more sophisticated methods
-    \item \textbf{Pro}: Almost parameter-free, fast yet accurate on deep models
-    \item \textbf{Cons}: Poor performance on kernel classifiers, no obvious way to generalize to non-classification tasks
-    \item Non-targeted by design as it searches for the min. adversarial perturbations. However, targeted versions can be designed with a few modifs
-\end{itemize}
-
-\sep
-
-\Thm[FGSM]: $1$-iteration $\ell_\infty$-PGD: 
-
-$r = \epsilon \sign(\nabla_x\ell(f_\theta(x), y))$
-
-\begin{itemize}
-    \item Only 1x overhead compared to standard training
-    \item "Weaker" adversary as PGD (weaker solver for the inner max step), than multi-iteration PGD
-\end{itemize}
 
 \section{Variational Autoencoder}
 
@@ -6645,7 +6442,11 @@ First, we center the data (pre-processing) as follows:
 \sum_{i=1}^k
 \vx_i
 \]
-Then we define $\MS:=\MX\MX^\T$, which is the sample covariance matrix. And then, in order to get $\MU$ we just
+Then we define
+\[
+\MS:=\MX\MX^\T
+\]
+which is the sample covariance matrix. And then, in order to get $\MU$ we just
 do the SVD of $\MS$. We can see that
 \[
 \MS=\MU\MSigma\MV^\T\MV\MSigma\MU^\T=\MU\MSigma^2\MU^\T.
@@ -6780,9 +6581,9 @@ via a linear map $\MW$ and then different Gaussian noises are added to the
 reconstructed vector (via $\veta$).
 
 So the \emph{latent variable prior} is $\vz\in\R^m$ where
-$
+\[
 \vz\sim\cN(\vo,\MI)
-$
+\]
 and we have a linear \emph{observation model} for $\vx\in\R^n$
 \[
 \vx=\vmu+\underset{n\times m}{\MW}\vz +\veta,
@@ -7159,12 +6960,6 @@ or \emph{simulation process}.
 
 \subsection{Variational Autoencoders (VAEs)}
 
-
-\begin{center}
-  \includegraphics[width=1\linewidth]{%
-img/VAE-forward-prop}
-\end{center}
-
 \textbf{Relation to Autoencoders}
 
 Recall, that with autoencoders, we had defined a concatenation of two
@@ -7365,8 +7160,15 @@ $\nabla _\mu \Exp{f(z)} = \Exp{\nabla _z f(z)}$, $\nabla _\Sigma \Exp{f(z)} = \d
 
 \textbf{Forward Pass and Backpropagation}
 
+\begin{center}
+  \includegraphics[width=1\linewidth]{%
+img/VAE-forward-prop}
+\end{center}
+
 So, first we do the whole backpropagation. And then we just compute the updates
 to the parameters $\theta$ and $\phi$ via backpropagation.
+
+\todo{Show exactly what the losses are (1) and (2) (or do it as an exercise)}
 
 \sep
 
@@ -7418,18 +7220,20 @@ the negative loss of $D$) see Minimax game VS Non-Saturating game.
 
 \sep
 
-\Def[Minimax Game]: Both $D$ and $G$ try to minimize and maximize the same
+\textbf{Minimax Game:} Both $D$ and $G$ try to minimize and maximize the same
 value function:
 
-$
+\begin{gather*}
+\begin{align*}
 V(G,D)
-=\min_{G}\max_{D} \cR^{(D)}$
-
-$=\min_{\theta_g}\max_{\theta_d}
+&=\min_{G}\max_{D} \cR^{(D)}
+\\
+&=\min_{\theta_g}\max_{\theta_d}
 \Exp[\vx\sim p_{\text{data}}]{\log(D_{\theta_d}(\vx))}
 +
 \Exp[\vz\sim p(\vz)]{\log(1-D_{\theta_d}(G_{\theta_g}(\vz)))}
-$
+\end{align*}
+\end{gather*}
 
 \todo{Write it in terms of cross-entropy!!}
 
@@ -7604,6 +7408,7 @@ So we alternate between
 
 \todo{From here on until end was not treated in lecture. See comments}
 
+\begin{comment}
 What prevents the generator from just learning about one specific true image and
 then constantly outputting it? (as it would be indistinguishable)
 
@@ -7639,15 +7444,7 @@ The problem with the Minimax game is that when $D$ becomes to smart, the
 gradient for $G$ goes away.
 
 \sep
-
-\Def[Mode collapse] is the failure of the generator to produce variety/diversity of samples, by collapsing many values of $z$ to the same sample $x$. A complete collapse is not common, but a partial collapse often happens in practice
-
-\Def[GANs vs VAEs]:
-
-\begin{itemize}
-    \item Well defined objective (easier training, eval metric): VAE: yes, GAN: no
-    \item Discrete latent variables: VAE: no, GAN: yes
-\end{itemize}
+\end{comment}
 
 \end{multicols*}
 \end{landscape}
